@@ -1,16 +1,16 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #0c0b10;
-  --color-bg-warm: #110f16;
-  --color-bg-card: #1a1823;
-  --color-bg-card-hover: #221f2c;
-  --color-text: #ede9e3;
-  --color-text-muted: #8a8580;
+  --color-bg: #faf3e8;
+  --color-bg-warm: #f5ebe0;
+  --color-bg-card: #fff8ef;
+  --color-text: #3a2e28;
+  --color-text-muted: #8a7a6e;
   --color-accent-lavender: #b49cfc;
   --color-accent-rose: #e8a0b4;
-  --color-accent-gold: #d4b896;
-  --color-accent-sage: #8fb5a1;
+  --color-accent-gold: #d4a853;
+  --color-accent-sage: #6d9e7a;
+  --color-pixel-shadow: #c4b59e;
 }
 
 @layer base {
@@ -20,139 +20,56 @@
   body {
     background-color: var(--color-bg);
     color: var(--color-text);
-    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-family: 'Nunito', system-ui, sans-serif;
     overflow-x: hidden;
-    letter-spacing: -0.01em;
   }
   ::selection {
     background-color: var(--color-accent-lavender);
-    color: var(--color-bg);
+    color: white;
   }
 }
 
-/* ---- Grain overlay ---- */
-.grain::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  pointer-events: none;
-  opacity: 0.035;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
-  background-size: 180px;
+/* Pixel fonts */
+.font-pixel {
+  font-family: 'Press Start 2P', monospace;
+}
+.font-body {
+  font-family: 'Nunito', system-ui, sans-serif;
 }
 
-/* ---- Staggered fade-in ---- */
-@keyframes revealUp {
-  from { opacity: 0; transform: translateY(40px) scale(0.98); filter: blur(4px); }
-  to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+/* Pixel art rendering */
+.pixel-art {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
 }
-@keyframes revealLeft {
-  from { opacity: 0; transform: translateX(-50px); }
-  to { opacity: 1; transform: translateX(0); }
+
+/* Sprite animation helper */
+@keyframes sprite-idle {
+  from { background-position-x: 0; }
+  to { background-position-x: -960px; } /* 10 frames * 96px (32*3) */
 }
-@keyframes revealRight {
-  from { opacity: 0; transform: translateX(50px); }
-  to { opacity: 1; transform: translateX(0); }
+
+@keyframes sprite-idle2 {
+  from { background-position-x: 0; }
+  to { background-position-x: -960px; }
 }
-@keyframes float {
+
+@keyframes sprite-sleep {
+  from { background-position-x: 0; }
+  to { background-position-x: -384px; } /* 4 frames * 96px */
+}
+
+@keyframes float-gentle {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-12px); }
-}
-@keyframes drift {
-  0%, 100% { transform: translate(0, 0) rotate(0deg); }
-  33% { transform: translate(15px, -10px) rotate(1deg); }
-  66% { transform: translate(-10px, 8px) rotate(-1deg); }
-}
-@keyframes pulse-glow {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.8; }
-}
-@keyframes marquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  50% { transform: translateY(-6px); }
 }
 
-.anim-reveal {
-  animation: revealUp 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
 }
-.anim-reveal-left {
-  animation: revealLeft 1s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-.anim-reveal-right {
-  animation: revealRight 1s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
+
 .anim-float {
-  animation: float 6s ease-in-out infinite;
-}
-.anim-drift {
-  animation: drift 12s ease-in-out infinite;
-}
-
-.d-1 { animation-delay: 0.1s; }
-.d-2 { animation-delay: 0.25s; }
-.d-3 { animation-delay: 0.4s; }
-.d-4 { animation-delay: 0.55s; }
-.d-5 { animation-delay: 0.7s; }
-.d-6 { animation-delay: 0.85s; }
-.d-7 { animation-delay: 1s; }
-
-/* ---- Scroll reveal ---- */
-.scroll-reveal {
-  opacity: 0;
-  transform: translateY(40px);
-  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.scroll-reveal.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* ---- Magnetic link hover ---- */
-.mag-link {
-  position: relative;
-  display: inline-block;
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-.mag-link:hover {
-  transform: translateY(-3px);
-}
-.mag-link::after {
-  content: '';
-  position: absolute;
-  bottom: -3px;
-  left: 0;
-  width: 0;
-  height: 2px;
-  background: linear-gradient(90deg, var(--color-accent-lavender), var(--color-accent-rose));
-  transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  border-radius: 2px;
-}
-.mag-link:hover::after {
-  width: 100%;
-}
-
-/* ---- Cards ---- */
-.card-hover {
-  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease, border-color 0.3s ease;
-}
-.card-hover:hover {
-  transform: translateY(-4px) scale(1.01);
-  box-shadow: 0 20px 60px -15px rgba(180, 156, 252, 0.12), 0 0 0 1px rgba(180, 156, 252, 0.08);
-}
-
-/* ---- Decorative divider ---- */
-.divider-glow {
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--color-accent-lavender), var(--color-accent-rose), transparent);
-  opacity: 0.3;
-}
-
-/* ---- Display font styling ---- */
-.font-display {
-  font-family: 'Fraunces', 'Georgia', serif;
-  font-variation-settings: 'SOFT' 100, 'WONK' 1;
-}
-.font-hand {
-  font-family: 'Caveat', cursive;
+  animation: float-gentle 4s ease-in-out infinite;
 }

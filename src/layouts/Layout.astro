@@ -6,9 +6,9 @@ interface Props {
   description?: string
 }
 
-const { 
-  title = 'Rouzeris — Artist, Maker, Developer',
-  description = 'Personal website of Rouzeris — artist, jewelry maker, and AI app developer.'
+const {
+  title = "Rouzeris — Yuma's Room",
+  description = 'Welcome to Yuma the cat\'s cozy pixel art room. Home of Rouzeris — artist, jewelry maker, and developer.'
 } = Astro.props
 ---
 
@@ -22,24 +22,9 @@ const {
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,600&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Press+Start+2P&display=swap" rel="stylesheet" />
   </head>
-  <body class="min-h-screen grain">
+  <body class="min-h-screen bg-[#faf3e8]">
     <slot />
-    <script>
-      // Intersection Observer for scroll reveals
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('visible')
-              observer.unobserve(entry.target)
-            }
-          })
-        },
-        { threshold: 0.1, rootMargin: '0px 0px -60px 0px' }
-      )
-      document.querySelectorAll('.scroll-reveal').forEach((el) => observer.observe(el))
-    </script>
   </body>
 </html>
