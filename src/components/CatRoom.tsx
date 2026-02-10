@@ -30,17 +30,8 @@ export default function CatRoom() {
             draggable={false}
           />
 
-          {/* Yuma the cat — positioned in the room */}
-          <div
-            className="absolute"
-            style={{
-              bottom: '28%',
-              left: '38%',
-              transform: 'translateX(-50%)',
-            }}
-          >
-            <CatSprite />
-          </div>
+          {/* Yuma the cat — walks around the room */}
+          <CatSprite />
         </div>
 
         {/* Shadow under room */}
