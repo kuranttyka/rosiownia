@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { useMachine } from '@xstate/react'
+import { catMachine } from './catMachine'
 
 const SCALE = 3
 const FRAME_SIZE = 32
@@ -10,108 +12,58 @@ interface SpriteAnim {
 }
 
 const anims: Record<string, SpriteAnim> = {
-  idle:      { src: '/sprites/cat/Idle.png',      frames: 10, speed: 150 },
-  idle2:     { src: '/sprites/cat/Idle2.png',      frames: 10, speed: 150 },
-  walkRight: { src: '/sprites/cat/WalkRight.png',  frames: 10, speed: 100 },
-  walkLeft:  { src: '/sprites/cat/WalkLeft.png',   frames: 10, speed: 100 },
-  sleep:     { src: '/sprites/cat/Sleep.png',      frames: 4,  speed: 400 },
-  sleepy:    { src: '/sprites/cat/Sleepy.png',     frames: 8,  speed: 250 },
-  dance:     { src: '/sprites/cat/Dance.png',      frames: 4,  speed: 200 },
+  Idle:        { src: '/sprites/cat/Idle.png',        frames: 13, speed: 150 },
+  Sitting:     { src: '/sprites/cat/Sitting.png',     frames: 6,  speed: 200 },
+  Waiting:     { src: '/sprites/cat/Waiting.png',     frames: 12, speed: 150 },
+  Sleepy:      { src: '/sprites/cat/Sleepy.png',      frames: 9,  speed: 250 },
+  WalkRight:   { src: '/sprites/cat/WalkRight.png',   frames: 10, speed: 100 },
+  WalkLeft:    { src: '/sprites/cat/WalkLeft.png',    frames: 10, speed: 100 },
+  Sleep:       { src: '/sprites/cat/Sleep.png',        frames: 4,  speed: 400 },
+  LayDown:     { src: '/sprites/cat/LayDown.png',      frames: 8,  speed: 200 },
+  Dance:       { src: '/sprites/cat/Dance.png',        frames: 12, speed: 150 },
+  Excited:     { src: '/sprites/cat/Excited.png',      frames: 12, speed: 120 },
+  Scratching:  { src: '/sprites/cat/Scratching.png',   frames: 12, speed: 120 },
+  EatingFull:  { src: '/sprites/cat/EatingFull.png',   frames: 15, speed: 150 },
+  Surprised:   { src: '/sprites/cat/Surprised.png',    frames: 4,  speed: 200 },
+  Cry:         { src: '/sprites/cat/Cry.png',          frames: 4,  speed: 250 },
+  Box1:        { src: '/sprites/cat/Box1.png',         frames: 4,  speed: 300 },
+  Box2:        { src: '/sprites/cat/Box2.png',         frames: 12, speed: 200 },
+  Sad:         { src: '/sprites/cat/Sad.png',          frames: 9,  speed: 200 },
 }
 
-// Room walkable area (% of container)
-const WALK_MIN_X = 15
-const WALK_MAX_X = 75
-const WALK_MIN_Y = 35
-const WALK_MAX_Y = 70
-
-type CatState = 'idle' | 'walking' | 'sleeping' | 'dancing'
-
 export default function CatSprite() {
-  const [pos, setPos] = useState({ x: 38, y: 55 })
-  const [animKey, setAnimKey] = useState<string>('idle')
+  const [state, send] = useMachine(catMachine)
+  const { x, y, targetX, targetY, animKey } = state.context
+  const [pos, setPos] = useState({ x, y })
   const [frame, setFrame] = useState(0)
-  const [catState, setCatState] = useState<CatState>('idle')
-  const targetRef = useRef({ x: 38, y: 55 })
-  const stateTimerRef = useRef<ReturnType<typeof setTimeout>>()
-
-  // Pick next behavior
-  const pickNextState = useCallback(() => {
-    const roll = Math.random()
-    if (roll < 0.5) {
-      // Walk to random spot
-      setCatState('walking')
-      targetRef.current = {
-        x: WALK_MIN_X + Math.random() * (WALK_MAX_X - WALK_MIN_X),
-        y: WALK_MIN_Y + Math.random() * (WALK_MAX_Y - WALK_MIN_Y),
-      }
-    } else if (roll < 0.75) {
-      // Idle
-      setCatState('idle')
-      const idleAnims = ['idle', 'idle2', 'sleepy']
-      setAnimKey(idleAnims[Math.floor(Math.random() * idleAnims.length)])
-      stateTimerRef.current = setTimeout(pickNextState, 3000 + Math.random() * 4000)
-    } else if (roll < 0.9) {
-      // Sleep
-      setCatState('sleeping')
-      setAnimKey('sleep')
-      stateTimerRef.current = setTimeout(pickNextState, 6000 + Math.random() * 5000)
-    } else {
-      // Dance
-      setCatState('dancing')
-      setAnimKey('dance')
-      stateTimerRef.current = setTimeout(pickNextState, 2000 + Math.random() * 2000)
-    }
-  }, [])
-
-  // Initialize
-  useEffect(() => {
-    stateTimerRef.current = setTimeout(pickNextState, 2000)
-    return () => { if (stateTimerRef.current) clearTimeout(stateTimerRef.current) }
-  }, [pickNextState])
+  const moveRef = useRef<ReturnType<typeof setInterval>>()
 
   // Walking movement
   useEffect(() => {
-    if (catState !== 'walking') return
+    if (moveRef.current) clearInterval(moveRef.current)
 
-    const target = targetRef.current
-    const dx = target.x - pos.x
-    const dy = target.y - pos.y
-    const dist = Math.sqrt(dx * dx + dy * dy)
-
-    if (dist < 1.5) {
-      // Arrived
-      setCatState('idle')
-      setAnimKey('idle')
-      stateTimerRef.current = setTimeout(pickNextState, 2000 + Math.random() * 3000)
-      return
+    if (state.matches('walking')) {
+      const speed = 0.35
+      moveRef.current = setInterval(() => {
+        setPos(prev => {
+          const dx = targetX - prev.x
+          const dy = targetY - prev.y
+          const dist = Math.sqrt(dx * dx + dy * dy)
+          if (dist < 1.5) {
+            clearInterval(moveRef.current!)
+            send({ type: 'ARRIVED' })
+            return prev
+          }
+          return {
+            x: prev.x + (dx / dist) * speed,
+            y: prev.y + (dy / dist) * speed,
+          }
+        })
+      }, 30)
     }
 
-    // Set walk animation direction
-    setAnimKey(dx > 0 ? 'walkRight' : 'walkLeft')
-
-    const speed = 0.4
-    const moveTimer = setInterval(() => {
-      setPos(prev => {
-        const ddx = targetRef.current.x - prev.x
-        const ddy = targetRef.current.y - prev.y
-        const d = Math.sqrt(ddx * ddx + ddy * ddy)
-        if (d < 1) {
-          clearInterval(moveTimer)
-          setCatState('idle')
-          setAnimKey('idle')
-          stateTimerRef.current = setTimeout(pickNextState, 2000 + Math.random() * 3000)
-          return prev
-        }
-        return {
-          x: prev.x + (ddx / d) * speed,
-          y: prev.y + (ddy / d) * speed,
-        }
-      })
-    }, 30)
-
-    return () => clearInterval(moveTimer)
-  }, [catState, pickNextState]) // eslint-disable-line react-hooks/exhaustive-deps
+    return () => { if (moveRef.current) clearInterval(moveRef.current) }
+  }, [state.value, targetX, targetY, send]) // eslint-disable-line
 
   // Frame animation
   useEffect(() => {
@@ -124,6 +76,10 @@ export default function CatSprite() {
     return () => clearInterval(interval)
   }, [animKey])
 
+  const handleClick = useCallback(() => {
+    send({ type: 'CLICK' })
+  }, [send])
+
   const anim = anims[animKey]
   if (!anim) return null
 
@@ -132,7 +88,8 @@ export default function CatSprite() {
 
   return (
     <div
-      className="absolute pixel-art pointer-events-none"
+      className="absolute pixel-art cursor-pointer"
+      onClick={handleClick}
       style={{
         left: `${pos.x}%`,
         top: `${pos.y}%`,
@@ -146,9 +103,8 @@ export default function CatSprite() {
         backgroundPositionY: 0,
         imageRendering: 'pixelated',
         zIndex: 10,
-        transition: 'none',
       }}
-      title="Yuma 🐱"
+      title="Click me! 🐱"
     />
   )
 }
