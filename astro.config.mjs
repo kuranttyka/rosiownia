@@ -8,10 +8,14 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   integrations: [react()],
 
+  server: {
+    host: true,
+  },
+
   vite: {
     plugins: [tailwindcss()],
     server: {
-      allowedHosts: 'all'
+      allowedHosts: ['.trycloudflare.com', '.vercel.app']
     }
   }
 });
