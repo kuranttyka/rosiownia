@@ -39,10 +39,11 @@ export default function CatSprite() {
   const moveRef = useRef<ReturnType<typeof setInterval>>()
 
   // Walking movement
+  const isWalking = state.matches('walking')
   useEffect(() => {
     if (moveRef.current) clearInterval(moveRef.current)
 
-    if (state.matches('walking')) {
+    if (isWalking) {
       const speed = 0.35
       moveRef.current = setInterval(() => {
         setPos(prev => {
@@ -63,24 +64,29 @@ export default function CatSprite() {
     }
 
     return () => { if (moveRef.current) clearInterval(moveRef.current) }
-  }, [state.value, targetX, targetY, send]) // eslint-disable-line
+  }, [isWalking, targetX, targetY, send])
+
+  // Override animKey for walking based on actual position
+  const effectiveAnimKey = isWalking
+    ? (targetX > pos.x ? 'WalkRight' : 'WalkLeft')
+    : animKey
 
   // Frame animation
   useEffect(() => {
-    const anim = anims[animKey]
+    const anim = anims[effectiveAnimKey]
     if (!anim) return
     setFrame(0)
     const interval = setInterval(() => {
       setFrame(f => (f + 1) % anim.frames)
     }, anim.speed)
     return () => clearInterval(interval)
-  }, [animKey])
+  }, [effectiveAnimKey])
 
   const handleClick = useCallback(() => {
     send({ type: 'CLICK' })
   }, [send])
 
-  const anim = anims[animKey]
+  const anim = anims[effectiveAnimKey]
   if (!anim) return null
 
   const scaledW = FRAME_SIZE * SCALE
