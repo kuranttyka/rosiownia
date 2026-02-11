@@ -52,8 +52,9 @@ export default function CatSprite() {
           const dist = Math.sqrt(dx * dx + dy * dy)
           if (dist < 1.5) {
             clearInterval(moveRef.current!)
-            send({ type: 'ARRIVED' })
-            return prev
+            const finalPos = { x: targetX, y: targetY }
+            send({ type: 'ARRIVED', ...finalPos })
+            return finalPos
           }
           return {
             x: prev.x + (dx / dist) * speed,
@@ -67,9 +68,7 @@ export default function CatSprite() {
   }, [isWalking, targetX, targetY, send])
 
   // Override animKey for walking based on actual position
-  const effectiveAnimKey = isWalking
-    ? (targetX > pos.x ? 'WalkRight' : 'WalkLeft')
-    : animKey
+  const effectiveAnimKey = animKey
 
   // Frame animation
   useEffect(() => {

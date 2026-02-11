@@ -24,12 +24,20 @@ function randomDelay(min: number, max: number) {
   return min + Math.random() * (max - min)
 }
 
+export function getWalkDirection(fromX: number, targetX: number) {
+  const facingRight = targetX > fromX
+  return {
+    facingRight,
+    animKey: facingRight ? 'WalkRight' : 'WalkLeft',
+  }
+}
+
 export const catMachine = setup({
   types: {
     context: {} as CatContext,
     events: {} as
       | { type: 'DECIDE' }
-      | { type: 'ARRIVED' }
+      | { type: 'ARRIVED'; x: number; y: number }
       | { type: 'WAKE' }
       | { type: 'CLICK' },
   },
@@ -43,10 +51,18 @@ export const catMachine = setup({
     }),
     pickWalkTarget: assign(({ context }) => {
       const t = randomTarget()
+      const direction = getWalkDirection(context.x, t.targetX)
       return {
         ...t,
-        facingRight: t.targetX > context.x,
-        animKey: t.targetX > context.x ? 'WalkRight' : 'WalkLeft',
+        facingRight: direction.facingRight,
+        animKey: direction.animKey,
+      }
+    }),
+    syncPosition: assign(({ event }) => {
+      if (event.type !== 'ARRIVED') return {}
+      return {
+        x: event.x,
+        y: event.y,
       }
     }),
     startSleep: assign(() => ({
@@ -110,6 +126,9 @@ export const catMachine = setup({
   states: {
     idle: {
       entry: 'pickIdleAnim',
+      on: {
+        DECIDE: { target: 'deciding' },
+      },
       after: {
         IDLE_DELAY: { target: 'deciding' },
       },
@@ -128,7 +147,7 @@ export const catMachine = setup({
     },
     walking: {
       on: {
-        ARRIVED: { target: 'idle' },
+        ARRIVED: { target: 'idle', actions: 'syncPosition' },
       },
     },
     sleeping: {
