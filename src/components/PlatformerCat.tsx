@@ -37,6 +37,20 @@ interface Platform {
   el?: HTMLElement
 }
 
+// Preload all sprite images to avoid flicker on first animation change
+const preloadedImages: Record<string, HTMLImageElement> = {}
+if (typeof window !== 'undefined') {
+  Object.values(anims).forEach(a => {
+    for (const src of [a.src, a.srcLeft]) {
+      if (!preloadedImages[src]) {
+        const img = new Image()
+        img.src = src
+        preloadedImages[src] = img
+      }
+    }
+  })
+}
+
 export default function PlatformerCat() {
   const canvasRef = useRef<HTMLDivElement>(null)
   const catRef = useRef<HTMLDivElement>(null)
