@@ -6,12 +6,13 @@ const GRAVITY = 0.6
 const JUMP_FORCE = -12
 const MOVE_SPEED = 3.5
 const RUN_SPEED = 5.5
+const ATTACK_DURATION = 4 * 100 // 4 frames at 100ms
 
 interface SpriteAnim {
   src: string
   srcLeft: string
   frames: number
-  speed: number // ms per frame
+  speed: number
 }
 
 const anims: Record<string, SpriteAnim> = {
@@ -52,14 +53,29 @@ export default function PlatformerCat() {
     frameTimer: 0,
     landTimer: 0,
     idleTimer: 0,
+    attackTimer: 0,
   })
   const platformsRef = useRef<Platform[]>([])
   const rafRef = useRef<number>(0)
   const lastTimeRef = useRef<number>(0)
+  // Mobile joystick state
+  const joystickRef = useRef({ active: false, dx: 0, dy: 0, startX: 0, startY: 0 })
 
   const [catStyle, setCatStyle] = useState({
     x: 100, y: 100, anim: 'idle', frame: 0, facingRight: true,
   })
+  const [joystickPos, setJoystickPos] = useState<{ x: number; y: number; dx: number; dy: number } | null>(null)
+
+  // Attack handler
+  const handleAttack = useCallback((clickX: number) => {
+    const s = stateRef.current
+    const catCenterX = s.x + (FRAME_SIZE * SCALE) / 2
+    s.facingRight = clickX > catCenterX
+    s.attackTimer = ATTACK_DURATION
+    s.anim = 'attack'
+    s.frame = 0
+    s.frameTimer = 0
+  }, [])
 
   // Collect platforms from DOM elements with data-platform
   const collectPlatforms = useCallback(() => {
@@ -68,7 +84,6 @@ export default function PlatformerCat() {
     const elements = container.querySelectorAll('[data-platform]')
     const platforms: Platform[] = []
 
-    // Ground
     const containerRect = container.getBoundingClientRect()
     platforms.push({
       x: 0,
@@ -94,7 +109,7 @@ export default function PlatformerCat() {
 
   // Game loop
   const gameLoop = useCallback((timestamp: number) => {
-    const dt = Math.min(timestamp - lastTimeRef.current, 33) // cap at ~30fps delta
+    const dt = Math.min(timestamp - lastTimeRef.current, 33)
     lastTimeRef.current = timestamp
 
     const s = stateRef.current
@@ -108,44 +123,52 @@ export default function PlatformerCat() {
     const catW = FRAME_SIZE * SCALE
     const catH = FRAME_SIZE * SCALE
 
-    // Input
-    const left = keys.has('a') || keys.has('arrowleft')
-    const right = keys.has('d') || keys.has('arrowright')
-    const jump = keys.has(' ') || keys.has('w') || keys.has('arrowup')
-    const running = keys.has('shift')
-    const down = keys.has('s') || keys.has('arrowdown')
+    // Attack timer
+    if (s.attackTimer > 0) {
+      s.attackTimer -= dt
+      if (s.attackTimer <= 0) s.attackTimer = 0
+    }
 
-    // Horizontal movement
-    const speed = running ? RUN_SPEED : MOVE_SPEED
-    if (left) {
-      s.vx = -speed
-      s.facingRight = false
-    } else if (right) {
-      s.vx = speed
-      s.facingRight = true
-    } else {
-      s.vx *= 0.7 // friction
-      if (Math.abs(s.vx) < 0.3) s.vx = 0
+    // Input (keyboard + joystick)
+    const joy = joystickRef.current
+    const left = keys.has('a') || keys.has('arrowleft') || (joy.active && joy.dx < -20)
+    const right = keys.has('d') || keys.has('arrowright') || (joy.active && joy.dx > 20)
+    const jump = keys.has(' ') || keys.has('w') || keys.has('arrowup') || (joy.active && joy.dy < -30)
+    const running = keys.has('shift') || (joy.active && Math.abs(joy.dx) > 50)
+    const down = keys.has('s') || keys.has('arrowdown') || (joy.active && joy.dy > 30)
+
+    // Don't move during attack
+    if (s.attackTimer <= 0) {
+      const speed = running ? RUN_SPEED : MOVE_SPEED
+      if (left) {
+        s.vx = -speed
+        s.facingRight = false
+      } else if (right) {
+        s.vx = speed
+        s.facingRight = true
+      } else {
+        s.vx *= 0.7
+        if (Math.abs(s.vx) < 0.3) s.vx = 0
+      }
     }
 
     // Jump
-    if (jump && s.grounded) {
+    if (jump && s.grounded && s.attackTimer <= 0) {
       s.vy = JUMP_FORCE
       s.grounded = false
     }
 
     // Gravity
     s.vy += GRAVITY
-    if (s.vy > 15) s.vy = 15 // terminal velocity
+    if (s.vy > 15) s.vy = 15
 
     // Move
     s.x += s.vx
     s.y += s.vy
 
-    // Collision with platforms
+    // Collision
     s.grounded = false
     for (const p of platforms) {
-      // Cat bottom hits platform top
       const catBottom = s.y + catH
       const catRight = s.x + catW
       const catLeft = s.x
@@ -161,7 +184,7 @@ export default function PlatformerCat() {
         s.vy = 0
         s.grounded = true
         if (s.landTimer === 0 && s.anim === 'fall') {
-          s.landTimer = 4 * 80 // land animation duration
+          s.landTimer = 4 * 80
         }
         break
       }
@@ -177,41 +200,44 @@ export default function PlatformerCat() {
     }
 
     // Animation state
-    const moving = Math.abs(s.vx) > 0.5
-    let newAnim = s.anim
+    if (s.attackTimer <= 0) {
+      const moving = Math.abs(s.vx) > 0.5
+      let newAnim = s.anim
 
-    if (!s.grounded) {
-      newAnim = s.vy < 0 ? 'jump' : 'fall'
-      s.landTimer = 0
-      s.idleTimer = 0
-    } else if (s.landTimer > 0) {
-      newAnim = 'land'
-      s.landTimer -= dt
-      if (s.landTimer <= 0) s.landTimer = 0
-    } else if (down) {
-      newAnim = 'duck'
-      s.idleTimer = 0
-    } else if (moving) {
-      newAnim = running ? 'run' : 'walk'
-      s.idleTimer = 0
-    } else {
-      s.idleTimer += dt
-      newAnim = s.idleTimer > 8000 ? 'sleep' : 'idle'
+      if (!s.grounded) {
+        newAnim = s.vy < 0 ? 'jump' : 'fall'
+        s.landTimer = 0
+        s.idleTimer = 0
+      } else if (s.landTimer > 0) {
+        newAnim = 'land'
+        s.landTimer -= dt
+        if (s.landTimer <= 0) s.landTimer = 0
+      } else if (down) {
+        newAnim = 'duck'
+        s.idleTimer = 0
+      } else if (moving) {
+        newAnim = running ? 'run' : 'walk'
+        s.idleTimer = 0
+      } else {
+        s.idleTimer += dt
+        newAnim = s.idleTimer > 8000 ? 'sleep' : 'idle'
+      }
+
+      if (newAnim !== s.anim) {
+        s.anim = newAnim
+        s.frame = 0
+        s.frameTimer = 0
+      }
     }
 
     // Frame animation
     s.frameTimer += dt
-    const anim = anims[newAnim]
-    if (newAnim !== s.anim) {
-      s.anim = newAnim
-      s.frame = 0
-      s.frameTimer = 0
-    } else if (anim && s.frameTimer >= anim.speed) {
+    const anim = anims[s.anim]
+    if (anim && s.frameTimer >= anim.speed) {
       s.frameTimer = 0
       s.frame = (s.frame + 1) % anim.frames
     }
 
-    // Update React state (batched)
     setCatStyle({
       x: Math.round(s.x),
       y: Math.round(s.y),
@@ -223,7 +249,7 @@ export default function PlatformerCat() {
     rafRef.current = requestAnimationFrame(gameLoop)
   }, [])
 
-  // Setup
+  // Setup keyboard + mouse + touch
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const key = e.key.toLowerCase()
@@ -236,25 +262,80 @@ export default function PlatformerCat() {
       keysRef.current.delete(e.key.toLowerCase())
     }
 
+    // Mouse click → attack
+    const handleMouseDown = (e: MouseEvent) => {
+      // Don't attack when clicking links
+      if ((e.target as HTMLElement).closest('a')) return
+      handleAttack(e.clientX)
+    }
+
+    // Touch: left half = joystick zone, tap right half = attack
+    const handleTouchStart = (e: TouchEvent) => {
+      for (const touch of Array.from(e.changedTouches)) {
+        const x = touch.clientX
+        const w = window.innerWidth
+
+        if (x < w * 0.4) {
+          // Joystick zone — left 40%
+          const joy = joystickRef.current
+          joy.active = true
+          joy.startX = touch.clientX
+          joy.startY = touch.clientY
+          joy.dx = 0
+          joy.dy = 0
+          setJoystickPos({ x: touch.clientX, y: touch.clientY, dx: 0, dy: 0 })
+        } else {
+          // Right side tap = attack
+          handleAttack(touch.clientX)
+        }
+      }
+    }
+
+    const handleTouchMove = (e: TouchEvent) => {
+      e.preventDefault()
+      const joy = joystickRef.current
+      if (!joy.active) return
+      for (const touch of Array.from(e.changedTouches)) {
+        joy.dx = Math.max(-60, Math.min(60, touch.clientX - joy.startX))
+        joy.dy = Math.max(-60, Math.min(60, touch.clientY - joy.startY))
+        setJoystickPos(prev => prev ? { ...prev, dx: joy.dx, dy: joy.dy } : null)
+      }
+    }
+
+    const handleTouchEnd = () => {
+      const joy = joystickRef.current
+      joy.active = false
+      joy.dx = 0
+      joy.dy = 0
+      setJoystickPos(null)
+    }
+
     window.addEventListener('keydown', handleKeyDown)
     window.addEventListener('keyup', handleKeyUp)
+    window.addEventListener('mousedown', handleMouseDown)
+    window.addEventListener('touchstart', handleTouchStart, { passive: false })
+    window.addEventListener('touchmove', handleTouchMove, { passive: false })
+    window.addEventListener('touchend', handleTouchEnd)
 
     collectPlatforms()
     window.addEventListener('resize', collectPlatforms)
 
-    // Start game loop
     lastTimeRef.current = performance.now()
     rafRef.current = requestAnimationFrame(gameLoop)
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown)
       window.removeEventListener('keyup', handleKeyUp)
+      window.removeEventListener('mousedown', handleMouseDown)
+      window.removeEventListener('touchstart', handleTouchStart)
+      window.removeEventListener('touchmove', handleTouchMove)
+      window.removeEventListener('touchend', handleTouchEnd)
       window.removeEventListener('resize', collectPlatforms)
       cancelAnimationFrame(rafRef.current)
     }
-  }, [gameLoop, collectPlatforms])
+  }, [gameLoop, collectPlatforms, handleAttack])
 
-  // Re-collect platforms when content changes
+  // Re-collect platforms on DOM changes
   useEffect(() => {
     const observer = new MutationObserver(collectPlatforms)
     if (canvasRef.current) {
@@ -269,10 +350,9 @@ export default function PlatformerCat() {
   const spriteSrc = catStyle.facingRight ? anim.src : anim.srcLeft
 
   return (
-    <div ref={canvasRef} className="relative w-full" style={{ minHeight: '100vh' }}>
-      {/* Page content — elements with data-platform become collidable */}
+    <div ref={canvasRef} className="relative w-full select-none" style={{ minHeight: '100vh', touchAction: 'none' }}>
+      {/* Page content — data-platform = collidable */}
       <div className="relative z-0">
-        {/* Title */}
         <h1
           data-platform
           className="inline-block px-6 py-3 text-4xl font-bold"
@@ -285,13 +365,11 @@ export default function PlatformerCat() {
             background: '#3d2c1e',
             color: '#faf3e8',
             borderRadius: 4,
-            imageRendering: 'pixelated',
           }}
         >
           Rouzeris
         </h1>
 
-        {/* Subtitle platform */}
         <p
           data-platform
           className="inline-block px-4 py-2 text-sm"
@@ -309,7 +387,6 @@ export default function PlatformerCat() {
           artist · jewelry maker · developer
         </p>
 
-        {/* Link platforms */}
         <a
           href="https://instagram.com/roksolanas_7"
           target="_blank"
@@ -382,7 +459,6 @@ export default function PlatformerCat() {
           💎 Jewelry
         </div>
 
-        {/* Ground decoration */}
         <div
           style={{
             position: 'absolute',
@@ -414,15 +490,56 @@ export default function PlatformerCat() {
         }}
       />
 
-      {/* Controls hint */}
+      {/* Mobile virtual joystick */}
+      {joystickPos && (
+        <>
+          {/* Base circle */}
+          <div
+            className="fixed z-30 rounded-full border-2 border-white/30"
+            style={{
+              left: joystickPos.x - 50,
+              top: joystickPos.y - 50,
+              width: 100,
+              height: 100,
+              background: 'rgba(0,0,0,0.1)',
+              pointerEvents: 'none',
+            }}
+          />
+          {/* Thumb */}
+          <div
+            className="fixed z-30 rounded-full"
+            style={{
+              left: joystickPos.x + joystickPos.dx - 20,
+              top: joystickPos.y + joystickPos.dy - 20,
+              width: 40,
+              height: 40,
+              background: 'rgba(0,0,0,0.3)',
+              pointerEvents: 'none',
+            }}
+          />
+        </>
+      )}
+
+      {/* Controls hint (hidden on mobile) */}
       <div
-        className="fixed bottom-4 left-1/2 -translate-x-1/2 z-20 px-4 py-2 text-xs opacity-50"
+        className="fixed bottom-4 left-1/2 -translate-x-1/2 z-20 px-4 py-2 text-xs opacity-50 hidden md:block"
         style={{
           fontFamily: '"Press Start 2P", monospace',
           color: '#3d2c1e',
         }}
       >
-        WASD / Arrows · Space = Jump · Shift = Run
+        WASD / Arrows · Space = Jump · Shift = Run · Click = Attack
+      </div>
+
+      {/* Mobile hint */}
+      <div
+        className="fixed bottom-4 left-1/2 -translate-x-1/2 z-20 px-4 py-2 text-xs opacity-50 md:hidden"
+        style={{
+          fontFamily: '"Press Start 2P", monospace',
+          color: '#3d2c1e',
+        }}
+      >
+        Left = Joystick · Right = Attack
       </div>
     </div>
   )
