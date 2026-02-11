@@ -1,0 +1,73 @@
+{
+  "frameSize": 32,
+  "width": 288,
+  "height": 704,
+  "anims": {
+    "idle": {
+      "y": 0,
+      "yLeft": 32,
+      "frames": 3,
+      "speed": 200
+    },
+    "walk": {
+      "y": 64,
+      "yLeft": 96,
+      "frames": 3,
+      "speed": 150
+    },
+    "run": {
+      "y": 128,
+      "yLeft": 160,
+      "frames": 4,
+      "speed": 120
+    },
+    "jump": {
+      "y": 192,
+      "yLeft": 224,
+      "frames": 1,
+      "speed": 200
+    },
+    "fall": {
+      "y": 256,
+      "yLeft": 288,
+      "frames": 1,
+      "speed": 200
+    },
+    "land": {
+      "y": 320,
+      "yLeft": 352,
+      "frames": 4,
+      "speed": 80
+    },
+    "sleep": {
+      "y": 384,
+      "yLeft": 416,
+      "frames": 5,
+      "speed": 300
+    },
+    "attack": {
+      "y": 448,
+      "yLeft": 480,
+      "frames": 4,
+      "speed": 100
+    },
+    "duck": {
+      "y": 512,
+      "yLeft": 544,
+      "frames": 2,
+      "speed": 200
+    },
+    "spin": {
+      "y": 576,
+      "yLeft": 608,
+      "frames": 9,
+      "speed": 80
+    },
+    "cheer": {
+      "y": 640,
+      "yLeft": 672,
+      "frames": 3,
+      "speed": 150
+    }
+  }
+}

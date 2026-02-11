@@ -8,26 +8,31 @@ const MOVE_SPEED = 3.5
 const RUN_SPEED = 5.5
 const ATTACK_DURATION = 4 * 100 // 4 frames at 100ms
 
+const ATLAS_SRC = '/sprites/catplayer/atlas.png'
+
 interface SpriteAnim {
-  src: string
-  srcLeft: string
+  y: number
+  yLeft: number
   frames: number
   speed: number
 }
 
 const anims: Record<string, SpriteAnim> = {
-  idle:    { src: '/sprites/catplayer/Cat_idle_1.png',      srcLeft: '/sprites/catplayer/Cat_idle_1_left.png',      frames: 3, speed: 200 },
-  walk:    { src: '/sprites/catplayer/Cat_walk_1.png',      srcLeft: '/sprites/catplayer/Cat_walk_1_left.png',      frames: 3, speed: 150 },
-  run:     { src: '/sprites/catplayer/Cat_run_1.png',       srcLeft: '/sprites/catplayer/Cat_run_1_left.png',       frames: 4, speed: 120 },
-  jump:    { src: '/sprites/catplayer/Cat_jump_1.png',      srcLeft: '/sprites/catplayer/Cat_jump_1_left.png',      frames: 1, speed: 200 },
-  fall:    { src: '/sprites/catplayer/Cat_fall_1.png',      srcLeft: '/sprites/catplayer/Cat_fall_1_left.png',      frames: 1, speed: 200 },
-  land:    { src: '/sprites/catplayer/Cat_landding_1.png',  srcLeft: '/sprites/catplayer/Cat_landding_1_left.png',  frames: 4, speed: 80 },
-  sleep:   { src: '/sprites/catplayer/Cat_asleep_1.png',    srcLeft: '/sprites/catplayer/Cat_asleep_1_left.png',    frames: 5, speed: 300 },
-  attack:  { src: '/sprites/catplayer/Cat_attack_1.png',    srcLeft: '/sprites/catplayer/Cat_attack_1_left.png',    frames: 4, speed: 100 },
-  duck:    { src: '/sprites/catplayer/Cat_ducking_idle_1.png', srcLeft: '/sprites/catplayer/Cat_ducking_idle_1_left.png', frames: 2, speed: 200 },
-  spin:    { src: '/sprites/catplayer/Cat_spining_1.png',   srcLeft: '/sprites/catplayer/Cat_spining_1_left.png',   frames: 9, speed: 80 },
-  cheer:   { src: '/sprites/catplayer/Cat_win_cheer_1.png', srcLeft: '/sprites/catplayer/Cat_win_cheer_1_left.png', frames: 3, speed: 150 },
+  idle:   { y: 0,   yLeft: 32,  frames: 3, speed: 200 },
+  walk:   { y: 64,  yLeft: 96,  frames: 3, speed: 150 },
+  run:    { y: 128, yLeft: 160, frames: 4, speed: 120 },
+  jump:   { y: 192, yLeft: 224, frames: 1, speed: 200 },
+  fall:   { y: 256, yLeft: 288, frames: 1, speed: 200 },
+  land:   { y: 320, yLeft: 352, frames: 4, speed: 80 },
+  sleep:  { y: 384, yLeft: 416, frames: 5, speed: 300 },
+  attack: { y: 448, yLeft: 480, frames: 4, speed: 100 },
+  duck:   { y: 512, yLeft: 544, frames: 2, speed: 200 },
+  spin:   { y: 576, yLeft: 608, frames: 9, speed: 80 },
+  cheer:  { y: 640, yLeft: 672, frames: 3, speed: 150 },
 }
+
+const ATLAS_W = 288
+const ATLAS_H = 704
 
 interface Platform {
   x: number
@@ -37,18 +42,10 @@ interface Platform {
   el?: HTMLElement
 }
 
-// Preload all sprite images to avoid flicker on first animation change
-const preloadedImages: Record<string, HTMLImageElement> = {}
+// Preload the single atlas
 if (typeof window !== 'undefined') {
-  Object.values(anims).forEach(a => {
-    for (const src of [a.src, a.srcLeft]) {
-      if (!preloadedImages[src]) {
-        const img = new Image()
-        img.src = src
-        preloadedImages[src] = img
-      }
-    }
-  })
+  const img = new Image()
+  img.src = ATLAS_SRC
 }
 
 export default function PlatformerCat() {
@@ -380,7 +377,7 @@ export default function PlatformerCat() {
   const anim = anims[catStyle.anim]
   const scaledW = FRAME_SIZE * SCALE
   const scaledH = FRAME_SIZE * SCALE
-  const spriteSrc = catStyle.facingRight ? anim.src : anim.srcLeft
+  const spriteY = catStyle.facingRight ? anim.y : anim.yLeft
 
   return (
     <div ref={canvasRef} className="relative w-full select-none" style={{ minHeight: '100vh', touchAction: 'none' }}>
@@ -513,11 +510,11 @@ export default function PlatformerCat() {
           top: catStyle.y,
           width: scaledW,
           height: scaledH,
-          backgroundImage: `url(${spriteSrc})`,
+          backgroundImage: `url(${ATLAS_SRC})`,
           backgroundRepeat: 'no-repeat',
-          backgroundSize: `${anim.frames * scaledW}px ${scaledH}px`,
+          backgroundSize: `${ATLAS_W * SCALE}px ${ATLAS_H * SCALE}px`,
           backgroundPositionX: -(catStyle.frame * scaledW),
-          backgroundPositionY: 0,
+          backgroundPositionY: -(spriteY * SCALE),
           imageRendering: 'pixelated',
           pointerEvents: 'none',
         }}
