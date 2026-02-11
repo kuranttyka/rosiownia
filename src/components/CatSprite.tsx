@@ -98,7 +98,7 @@ export default function CatSprite() {
       style={{
         left: `${pos.x}%`,
         top: `${pos.y}%`,
-        transform: `translate(-50%, -50%)${isWalking ? ` translateY(${Math.sin(frame * 0.8) * 3}px)` : ''}`,
+        transform: 'translate(-50%, -50%)',
         width: scaledW,
         height: scaledH,
         backgroundImage: `url(${anim.src})`,
