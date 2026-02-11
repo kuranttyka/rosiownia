@@ -1,15 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro'
+import SpriteDebugger from '../components/SpriteDebugger'
 ---
 
 <Layout title="Rosiownia — Debug">
-  <div id="debug-root"></div>
-  <script>
-    import { createElement } from 'react'
-    import { createRoot } from 'react-dom/client'
-    import SpriteDebugger from '../components/SpriteDebugger'
-    
-    const root = createRoot(document.getElementById('debug-root')!)
-    root.render(createElement(SpriteDebugger))
-  </script>
+  <SpriteDebugger client:load />
 </Layout>
