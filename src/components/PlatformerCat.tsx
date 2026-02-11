@@ -79,6 +79,8 @@ export default function PlatformerCat() {
     x: 100, y: 100, anim: 'idle', frame: 0, facingRight: true,
   })
   const [joystickPos, setJoystickPos] = useState<{ x: number; y: number; dx: number; dy: number } | null>(null)
+  const [isMobile, setIsMobile] = useState(false)
+  const joystickBaseRef = useRef<{ x: number; y: number }>({ x: 80, y: 0 })
 
   // Attack handler
   const handleAttack = useCallback((clickX: number) => {
@@ -293,11 +295,15 @@ export default function PlatformerCat() {
           // Joystick zone — left 40%
           const joy = joystickRef.current
           joy.active = true
-          joy.startX = touch.clientX
-          joy.startY = touch.clientY
-          joy.dx = 0
-          joy.dy = 0
-          setJoystickPos({ x: touch.clientX, y: touch.clientY, dx: 0, dy: 0 })
+          joy.startX = joystickBaseRef.current.x
+          joy.startY = joystickBaseRef.current.y
+          joy.dx = touch.clientX - joystickBaseRef.current.x
+          joy.dy = touch.clientY - joystickBaseRef.current.y
+          const clampDx = Math.max(-60, Math.min(60, joy.dx))
+          const clampDy = Math.max(-60, Math.min(60, joy.dy))
+          joy.dx = clampDx
+          joy.dy = clampDy
+          setJoystickPos({ x: joystickBaseRef.current.x, y: joystickBaseRef.current.y, dx: clampDx, dy: clampDy })
         } else {
           // Right side tap = attack
           handleAttack(touch.clientX)
@@ -312,7 +318,8 @@ export default function PlatformerCat() {
       for (const touch of Array.from(e.changedTouches)) {
         joy.dx = Math.max(-60, Math.min(60, touch.clientX - joy.startX))
         joy.dy = Math.max(-60, Math.min(60, touch.clientY - joy.startY))
-        setJoystickPos(prev => prev ? { ...prev, dx: joy.dx, dy: joy.dy } : null)
+        const base = joystickBaseRef.current
+        setJoystickPos({ x: base.x, y: base.y, dx: joy.dx, dy: joy.dy })
       }
     }
 
@@ -321,7 +328,7 @@ export default function PlatformerCat() {
       joy.active = false
       joy.dx = 0
       joy.dy = 0
-      setJoystickPos(null)
+      setJoystickPos(prev => prev ? { ...prev, dx: 0, dy: 0 } : null)
     }
 
     window.addEventListener('keydown', handleKeyDown)
@@ -331,8 +338,20 @@ export default function PlatformerCat() {
     window.addEventListener('touchmove', handleTouchMove, { passive: false })
     window.addEventListener('touchend', handleTouchEnd)
 
+    // Detect touch device
+    const mobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+    setIsMobile(mobile)
+    if (mobile) {
+      joystickBaseRef.current = { x: 80, y: window.innerHeight - 120 }
+    }
+
     collectPlatforms()
-    window.addEventListener('resize', collectPlatforms)
+    window.addEventListener('resize', () => {
+      collectPlatforms()
+      if (mobile) {
+        joystickBaseRef.current = { x: 80, y: window.innerHeight - 120 }
+      }
+    })
 
     lastTimeRef.current = performance.now()
     rafRef.current = requestAnimationFrame(gameLoop)
@@ -504,18 +523,19 @@ export default function PlatformerCat() {
         }}
       />
 
-      {/* Mobile virtual joystick */}
-      {joystickPos && (
+      {/* Mobile virtual joystick — always visible on touch devices */}
+      {isMobile && (
         <>
           {/* Base circle */}
           <div
-            className="fixed z-30 rounded-full border-2 border-white/30"
+            className="fixed z-30 rounded-full border-2"
             style={{
-              left: joystickPos.x - 50,
-              top: joystickPos.y - 50,
+              left: joystickBaseRef.current.x - 50,
+              top: joystickBaseRef.current.y - 50,
               width: 100,
               height: 100,
-              background: 'rgba(0,0,0,0.1)',
+              background: 'rgba(61,44,30,0.08)',
+              borderColor: 'rgba(61,44,30,0.2)',
               pointerEvents: 'none',
             }}
           />
@@ -523,12 +543,13 @@ export default function PlatformerCat() {
           <div
             className="fixed z-30 rounded-full"
             style={{
-              left: joystickPos.x + joystickPos.dx - 20,
-              top: joystickPos.y + joystickPos.dy - 20,
+              left: joystickBaseRef.current.x + (joystickPos?.dx ?? 0) - 20,
+              top: joystickBaseRef.current.y + (joystickPos?.dy ?? 0) - 20,
               width: 40,
               height: 40,
-              background: 'rgba(0,0,0,0.3)',
+              background: joystickPos?.dx || joystickPos?.dy ? 'rgba(61,44,30,0.35)' : 'rgba(61,44,30,0.15)',
               pointerEvents: 'none',
+              transition: !(joystickPos?.dx || joystickPos?.dy) ? 'left 0.15s, top 0.15s' : 'none',
             }}
           />
         </>
