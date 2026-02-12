@@ -31,19 +31,24 @@ if (typeof window !== 'undefined') {
 }
 
 let audioCtx: AudioContext | null = null
-function playPopSound() {
+let clickAudioBuffer: AudioBuffer | null = null
+
+const loadAudio = async (url: string) => {
   if (!audioCtx) audioCtx = new AudioContext()
-  const osc = audioCtx.createOscillator()
-  const gain = audioCtx.createGain()
-  osc.connect(gain)
-  gain.connect(audioCtx.destination)
-  osc.type = 'sine'
-  osc.frequency.setValueAtTime(880, audioCtx.currentTime)
-  osc.frequency.exponentialRampToValueAtTime(220, audioCtx.currentTime + 0.1)
-  gain.gain.setValueAtTime(0.3, audioCtx.currentTime)
-  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12)
-  osc.start(audioCtx.currentTime)
-  osc.stop(audioCtx.currentTime + 0.12)
+  const response = await fetch(url)
+  const arrayBuffer = await response.arrayBuffer()
+  return await audioCtx.decodeAudioData(arrayBuffer)
+}
+
+async function playClickSound() {
+  if (!audioCtx) audioCtx = new AudioContext()
+  if (!clickAudioBuffer) {
+    clickAudioBuffer = await loadAudio('/sounds/click-tape.mp3')
+  }
+  const source = audioCtx.createBufferSource()
+  source.buffer = clickAudioBuffer
+  source.connect(audioCtx.destination)
+  source.start(0)
 }
 
 export default function RPGCat() {
@@ -77,7 +82,7 @@ export default function RPGCat() {
     s.frame = 0
     s.frameTimer = 0
     s.idleTimer = 0
-    playPopSound()
+    playClickSound()
   }, [])
 
   const gameLoop = useCallback((timestamp: number) => {
