@@ -56,6 +56,8 @@ export default function RPGCat() {
   const stateRef = useRef({
     x: 0,
     y: 0,
+    vx: 0,
+    vy: 0,
     facingRight: true,
     anim: 'idle' as string,
     frame: 0,
@@ -82,6 +84,8 @@ export default function RPGCat() {
     s.frame = 0
     s.frameTimer = 0
     s.idleTimer = 0
+    // Capture current velocity for sliding momentum
+    // (velocity will be applied during attack with friction)
     playClickSound()
   }, [])
 
@@ -103,11 +107,17 @@ export default function RPGCat() {
     // Attack timer
     if (s.attackTimer > 0) {
       s.attackTimer -= dt
-      if (s.attackTimer <= 0) s.attackTimer = 0
+      if (s.attackTimer <= 0) {
+        s.attackTimer = 0
+        // When attack ends, clear velocity
+        s.vx = 0
+        s.vy = 0
+      }
     }
 
-    // Movement (only when not attacking)
+    // Movement logic
     if (s.attackTimer <= 0) {
+      // Normal movement - not attacking
       const joy = joystickRef.current
       const left = keys.has('a') || keys.has('arrowleft') || (joy.active && joy.dx < -20)
       const right = keys.has('d') || keys.has('arrowright') || (joy.active && joy.dx > 20)
@@ -127,17 +137,14 @@ export default function RPGCat() {
         dy = (dy / norm) * MOVE_SPEED
       }
 
-      s.x += dx
-      s.y += dy
+      s.vx = dx
+      s.vy = dy
 
-      // Bounds
-      if (s.x < 0) s.x = 0
-      if (s.x + catW > window.innerWidth) s.x = window.innerWidth - catW
-      if (s.y < 0) s.y = 0
-      if (s.y + catH > window.innerHeight) s.y = window.innerHeight - catH
+      s.x += s.vx
+      s.y += s.vy
 
       // Animation
-      const moving = dx !== 0 || dy !== 0
+      const moving = s.vx !== 0 || s.vy !== 0
       let newAnim = s.anim
       if (moving) {
         newAnim = 'walk'
@@ -154,7 +161,20 @@ export default function RPGCat() {
         s.frame = 0
         s.frameTimer = 0
       }
+    } else {
+      // During attack - apply momentum with friction
+      s.vx *= 0.5
+      s.vy *= 0.5
+
+      s.x += s.vx
+      s.y += s.vy
     }
+
+    // Bounds
+    if (s.x < 0) s.x = 0
+    if (s.x + catW > window.innerWidth) s.x = window.innerWidth - catW
+    if (s.y < 0) s.y = 0
+    if (s.y + catH > window.innerHeight) s.y = window.innerHeight - catH
 
     // Frame tick
     s.frameTimer += dt

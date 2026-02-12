@@ -7,15 +7,32 @@ import RPGCat from '../components/RPGCat'
   <main style="max-width: 1200px; margin: 0 auto; padding: 32px 20px 120px;">
     <div class="bento-grid">
       
-      <!-- Hero -->
-      <div class="card hero-card" style="grid-column: span 2;">
+      <!-- Hero - spans 2 cols, 2 rows for prominence -->
+      <div class="card hero-card" style="grid-column: span 2; grid-row: span 2;">
         <div style="padding: 48px 40px;">
           <h1 style="font-size: clamp(2.8rem, 6vw, 4.5rem); font-weight: 300; color: #3d2c1e; margin: 0; line-height: 1.1; letter-spacing: -0.02em;">Rouzeris</h1>
           <p style="font-size: 1.15rem; color: #8B6F47; margin-top: 12px; font-weight: 400; letter-spacing: 0.08em;">artist · jewelry maker · developer</p>
         </div>
       </div>
 
-      <!-- Anime Library (horizontal scroll) -->
+      <!-- Instagram - tall card, 2 rows -->
+      <div class="card" style="grid-row: span 2;">
+        <div style="padding: 24px;">
+          <h2 class="card-title">📸 Instagram</h2>
+          <div style="display: flex; flex-direction: column; gap: 16px; margin-top: 8px;">
+            <a href="https://instagram.com/roksolanas_7" target="_blank" rel="noopener" class="insta-link">
+              📷 @roksolanas_7
+              <span style="font-size: 0.8rem; color: #8B6F47; display: block; margin-top: 2px;">personal</span>
+            </a>
+            <a href="https://instagram.com/jumabestia" target="_blank" rel="noopener" class="insta-link">
+              🐱 @jumabestia
+              <span style="font-size: 0.8rem; color: #8B6F47; display: block; margin-top: 2px;">Yuma the cat</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Anime Library - 2 cols -->
       <div class="card" style="grid-column: span 2; overflow: hidden;">
         <div style="padding: 24px;">
           <h2 class="card-title">📺 Anime Library</h2>
@@ -39,8 +56,28 @@ import RPGCat from '../components/RPGCat'
         </div>
       </div>
 
-      <!-- Jewelry Gallery -->
-      <div class="card" style="grid-column: span 2;">
+      <!-- Blog - 1 col -->
+      <div class="card">
+        <div style="padding: 24px;">
+          <h2 class="card-title">📝 Blog</h2>
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            {[
+              { title: 'Making jewelry with recycled silver', color: '#c8c0b8' },
+              { title: 'My top 10 anime of 2025', color: '#c4c4e8' },
+              { title: 'Building apps with AI', color: '#c4dce8' },
+            ].map((post) => (
+              <div class="blog-item">
+                <div style={`height: 60px; border-radius: 8px; background: ${post.color}; margin-bottom: 8px;`}></div>
+                <h3 style="font-size: 0.9rem; color: #3d2c1e; margin: 0; font-weight: 500; line-height: 1.3;">{post.title}</h3>
+                <p style="font-size: 0.78rem; color: #8B6F47; margin-top: 4px;">Read more →</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <!-- Jewelry Gallery - 2 cols, 2 rows for visual impact -->
+      <div class="card" style="grid-column: span 2; grid-row: span 2;">
         <div style="padding: 24px;">
           <h2 class="card-title">💎 Jewelry</h2>
           <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
@@ -61,11 +98,11 @@ import RPGCat from '../components/RPGCat'
         </div>
       </div>
 
-      <!-- Spotify (horizontal scroll) -->
-      <div class="card" style="grid-column: span 2; overflow: hidden;">
+      <!-- Spotify - 1 col, 2 rows -->
+      <div class="card" style="grid-row: span 2; overflow: hidden;">
         <div style="padding: 24px;">
           <h2 class="card-title">🎵 Listening</h2>
-          <div style="display: flex; gap: 14px; overflow-x: auto; padding-bottom: 8px; scroll-snap-type: x mandatory;">
+          <div style="display: flex; flex-direction: column; gap: 12px; overflow-y: auto; max-height: 400px;">
             {[
               { track: 'Stefania', artist: 'Kalush Orchestra', color: '#e8c4a4' },
               { track: 'Щедрик', artist: 'Pentatonix', color: '#a4c4e8' },
@@ -74,51 +111,14 @@ import RPGCat from '../components/RPGCat'
               { track: 'Homura', artist: 'LiSA', color: '#a4e8c4' },
               { track: 'おまえのドリーム', artist: 'TATSURO', color: '#e8d8a4' },
             ].map((song) => (
-              <div style="flex-shrink: 0; width: 120px; scroll-snap-align: start;">
-                <div style={`width: 120px; height: 120px; border-radius: 8px; background: ${song.color};`}></div>
-                <div style="margin-top: 6px;">
-                  <div style="font-size: 0.85rem; color: #3d2c1e; line-height: 1.2;">{song.track}</div>
-                  <div style="font-size: 0.75rem; color: #8B6F47;">{song.artist}</div>
+              <div style="display: flex; gap: 12px; align-items: center;">
+                <div style={`width: 60px; height: 60px; flex-shrink: 0; border-radius: 8px; background: ${song.color};`}></div>
+                <div>
+                  <div style="font-size: 0.88rem; color: #3d2c1e; font-weight: 500; line-height: 1.2;">{song.track}</div>
+                  <div style="font-size: 0.75rem; color: #8B6F47; margin-top: 2px;">{song.artist}</div>
                 </div>
               </div>
             ))}
-          </div>
-        </div>
-      </div>
-
-      <!-- Blog -->
-      <div class="card" style="grid-column: span 2;">
-        <div style="padding: 24px;">
-          <h2 class="card-title">📝 Blog</h2>
-          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
-            {[
-              { title: 'Making jewelry with recycled silver', color: '#c8c0b8' },
-              { title: 'My top 10 anime of 2025', color: '#c4c4e8' },
-              { title: 'Building apps with AI', color: '#c4dce8' },
-            ].map((post) => (
-              <div class="blog-item">
-                <div style={`height: 80px; border-radius: 8px; background: ${post.color}; margin-bottom: 10px;`}></div>
-                <h3 style="font-size: 0.95rem; color: #3d2c1e; margin: 0; font-weight: 500; line-height: 1.3;">{post.title}</h3>
-                <p style="font-size: 0.8rem; color: #8B6F47; margin-top: 4px;">Read more →</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <!-- Instagram -->
-      <div class="card">
-        <div style="padding: 24px;">
-          <h2 class="card-title">📸 Instagram</h2>
-          <div style="display: flex; flex-direction: column; gap: 16px; margin-top: 8px;">
-            <a href="https://instagram.com/roksolanas_7" target="_blank" rel="noopener" class="insta-link">
-              📷 @roksolanas_7
-              <span style="font-size: 0.8rem; color: #8B6F47; display: block; margin-top: 2px;">personal</span>
-            </a>
-            <a href="https://instagram.com/jumabestia" target="_blank" rel="noopener" class="insta-link">
-              🐱 @jumabestia
-              <span style="font-size: 0.8rem; color: #8B6F47; display: block; margin-top: 2px;">Yuma the cat</span>
-            </a>
           </div>
         </div>
       </div>
@@ -134,6 +134,7 @@ import RPGCat from '../components/RPGCat'
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 18px;
+    grid-auto-rows: minmax(140px, auto);
   }
 
   @media (max-width: 768px) {
@@ -205,7 +206,7 @@ import RPGCat from '../components/RPGCat'
     background: #f0e6d6;
   }
 
-  /* Scrollbar styling for anime list */
+  /* Scrollbar styling */
   .card ::-webkit-scrollbar {
     width: 4px;
   }
