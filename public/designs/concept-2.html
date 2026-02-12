@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ROUZERIS — Editorial</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --black: #0a0a0a;
+  --white: #f8f6f2;
+  --accent: #d4634a;
+  --grey: #888;
+  --light-grey: #e8e4de;
+}
+html { font-family: 'DM Sans', sans-serif; background: var(--white); color: var(--black); scroll-behavior: smooth; }
+body { overflow-x: hidden; }
+
+/* Typography */
+h1, h2, h3 { font-family: 'Playfair Display', serif; }
+.section-label {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--grey);
+  margin-bottom: 12px;
+}
+
+/* Header */
+.header {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  padding: 40px;
+}
+.header::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(ellipse at 30% 50%, rgba(212,99,74,0.06) 0%, transparent 60%);
+  pointer-events: none;
+}
+.header h1 {
+  font-size: clamp(4rem, 12vw, 12rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 0.9;
+  position: relative;
+}
+.header h1 span {
+  display: block;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 0.35em;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  margin-top: 8px;
+}
+.header .issue {
+  position: absolute;
+  top: 40px;
+  right: 40px;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--grey);
+}
+.header .tagline {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: clamp(1rem, 2vw, 1.6rem);
+  color: var(--grey);
+  margin-top: 24px;
+}
+
+/* Divider */
+.divider {
+  width: 100%;
+  height: 1px;
+  background: var(--black);
+  margin: 0;
+}
+.divider.thin { opacity: 0.15; }
+
+/* Sections */
+.section {
+  padding: 80px 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Anime — asymmetric two column */
+.anime-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: start;
+}
+.anime-section .left {
+  position: sticky;
+  top: 100px;
+}
+.anime-section .left h2 {
+  font-size: clamp(2.5rem, 5vw, 5rem);
+  font-weight: 900;
+  line-height: 1;
+}
+.anime-section .left h2 em { font-weight: 400; color: var(--accent); }
+.anime-list {
+  list-style: none;
+}
+.anime-list li {
+  padding: 20px 0;
+  border-bottom: 1px solid var(--light-grey);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 15px;
+  transition: color 0.3s;
+}
+.anime-list li:hover { color: var(--accent); }
+.anime-list li .num {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  color: var(--grey);
+  font-size: 13px;
+}
+
+/* Spotify — editorial grid */
+.spotify-section h2 {
+  font-size: clamp(2rem, 4vw, 4rem);
+  margin-bottom: 40px;
+  font-weight: 400;
+  font-style: italic;
+}
+.spotify-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.spotify-card {
+  position: relative;
+  padding: 24px;
+  border: 1px solid rgba(0,0,0,0.08);
+  transition: all 0.4s;
+}
+.spotify-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-4px);
+}
+.spotify-card .art {
+  width: 100%;
+  aspect-ratio: 1;
+  margin-bottom: 16px;
+}
+.spotify-card .track { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; }
+.spotify-card .artist-name { font-size: 12px; color: var(--grey); margin-top: 4px; letter-spacing: 0.05em; }
+
+/* Gallery — overlapping magazine layout */
+.gallery-section h2 {
+  font-size: clamp(2rem, 4vw, 4rem);
+  margin-bottom: 40px;
+  font-weight: 900;
+}
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-auto-rows: 80px;
+  gap: 16px;
+}
+.gallery-item {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  padding: 16px;
+  transition: transform 0.5s;
+}
+.gallery-item:hover { transform: scale(1.02); }
+.gallery-item span {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  color: white;
+  font-size: 14px;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  position: relative;
+  z-index: 1;
+}
+.gallery-item:nth-child(1) { grid-column: 1/6; grid-row: 1/4; }
+.gallery-item:nth-child(2) { grid-column: 6/10; grid-row: 1/3; }
+.gallery-item:nth-child(3) { grid-column: 10/13; grid-row: 1/5; }
+.gallery-item:nth-child(4) { grid-column: 1/4; grid-row: 4/6; }
+.gallery-item:nth-child(5) { grid-column: 4/8; grid-row: 3/6; }
+.gallery-item:nth-child(6) { grid-column: 8/13; grid-row: 5/7; }
+
+/* Links */
+.links-section {
+  text-align: center;
+  padding: 100px 40px;
+}
+.links-section a {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.2rem, 2.5vw, 2rem);
+  color: var(--black);
+  text-decoration: none;
+  display: inline-block;
+  margin: 0 30px;
+  position: relative;
+  transition: color 0.3s;
+}
+.links-section a::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--accent);
+  transition: width 0.4s;
+}
+.links-section a:hover { color: var(--accent); }
+.links-section a:hover::after { width: 100%; }
+
+/* Cat in corner */
+.cat-corner {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 96px;
+  height: 96px;
+  z-index: 100;
+  image-rendering: pixelated;
+  opacity: 0.7;
+  transition: opacity 0.3s;
+}
+.cat-corner:hover { opacity: 1; }
+.cat-sprite {
+  width: 96px; height: 96px;
+  background-image: url('https://rosiownia-eta.vercel.app/sprites/catplayer/atlas.png');
+  background-size: calc(288px * 3) calc(704px * 3);
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 40px;
+  font-size: 11px;
+  color: var(--grey);
+  letter-spacing: 0.2em;
+}
+
+/* Fade-in animation */
+.fade-in {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+  .anime-section { grid-template-columns: 1fr; gap: 30px; }
+  .anime-section .left { position: static; }
+  .spotify-grid { grid-template-columns: 1fr 1fr; }
+  .gallery-grid { grid-template-columns: 1fr 1fr; grid-auto-rows: 120px; }
+  .gallery-item:nth-child(n) { grid-column: auto; grid-row: auto; }
+  .section { padding: 50px 20px; }
+  .header { padding: 20px; }
+  .links-section a { display: block; margin: 16px 0; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="issue">ISSUE Nº 01 — 2026</div>
+  <h1>ROUZERIS<span>artist · jewelry maker · developer</span></h1>
+  <p class="tagline">a personal exhibition in digital form</p>
+</div>
+
+<div class="divider"></div>
+
+<div class="section anime-section fade-in">
+  <div class="left">
+    <div class="section-label">currently watching</div>
+    <h2>The<br><em>Watchlist</em></h2>
+  </div>
+  <div class="right">
+    <ul class="anime-list">
+      <li><span>Spy × Family</span><span class="num">01</span></li>
+      <li><span>Chainsaw Man</span><span class="num">02</span></li>
+      <li><span>Jujutsu Kaisen</span><span class="num">03</span></li>
+      <li><span>My Dress-Up Darling</span><span class="num">04</span></li>
+      <li><span>Bocchi the Rock!</span><span class="num">05</span></li>
+      <li><span>Frieren</span><span class="num">06</span></li>
+      <li><span>Violet Evergarden</span><span class="num">07</span></li>
+      <li><span>Attack on Titan</span><span class="num">08</span></li>
+    </ul>
+  </div>
+</div>
+
+<div class="divider thin"></div>
+
+<div class="section fade-in">
+  <div class="section-label">on repeat</div>
+  <h2>Listening</h2>
+  <div class="spotify-grid">
+    <div class="spotify-card">
+      <div class="art" style="background: linear-gradient(135deg, #c0392b, #e74c3c);"></div>
+      <div class="track">Тримай Мене</div>
+      <div class="artist-name">Один в Каное</div>
+    </div>
+    <div class="spotify-card">
+      <div class="art" style="background: linear-gradient(135deg, #1a1a2e, #4a4a6e);"></div>
+      <div class="track">Motion Sickness</div>
+      <div class="artist-name">Phoebe Bridgers</div>
+    </div>
+    <div class="spotify-card">
+      <div class="art" style="background: linear-gradient(135deg, #f4d03f, #e9a820);"></div>
+      <div class="track">Stefania</div>
+      <div class="artist-name">Kalush Orchestra</div>
+    </div>
+    <div class="spotify-card">
+      <div class="art" style="background: linear-gradient(135deg, #2c3e50, #4ca1af);"></div>
+      <div class="track">Dissolve</div>
+      <div class="artist-name">Absofacto</div>
+    </div>
+    <div class="spotify-card">
+      <div class="art" style="background: linear-gradient(135deg, #6c3483, #a569bd);"></div>
+      <div class="track">Плакала</div>
+      <div class="artist-name">KAZKA</div>
+    </div>
+    <div class="spotify-card">
+      <div class="art" style="background: linear-gradient(135deg, #0d0d0d, #333);"></div>
+      <div class="track">Line Without a Hook</div>
+      <div class="artist-name">Ricky Montgomery</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider thin"></div>
+
+<div class="section fade-in">
+  <div class="section-label">selected works</div>
+  <h2>Gallery</h2>
+  <div class="gallery-grid">
+    <div class="gallery-item" style="background: linear-gradient(180deg, #ff7b54, #ffb26b);"><span>Sunset Painting</span></div>
+    <div class="gallery-item" style="background: linear-gradient(135deg, #2d2d2d, #666);"><span>Portrait Study</span></div>
+    <div class="gallery-item" style="background: linear-gradient(180deg, #ffd700, #b8860b);"><span>Jewelry Collection</span></div>
+    <div class="gallery-item" style="background: linear-gradient(135deg, #1a1a3e, #4a4a8e);"><span>City at Dusk</span></div>
+    <div class="gallery-item" style="background: linear-gradient(135deg, #e91e63, #ad1457);"><span>Floral Ring</span></div>
+    <div class="gallery-item" style="background: linear-gradient(135deg, #1b5e20, #4caf50);"><span>Nature Sketch</span></div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div class="links-section fade-in">
+  <div class="section-label">connect</div>
+  <br><br>
+  <a href="https://instagram.com/roksolanas_7" target="_blank">@roksolanas_7</a>
+  <a href="https://instagram.com/jumabestia" target="_blank">@jumabestia</a>
+</div>
+
+<div class="footer">ROUZERIS © 2026 — CRAFTED WITH ♥ AND PIXELS</div>
+
+<div class="cat-corner" id="cat">
+  <div class="cat-sprite" id="catSprite"></div>
+</div>
+
+<script>
+// Cat idle animation
+const sprite = document.getElementById('catSprite');
+const frameW = 96, frameH = 96;
+let frame = 0;
+setInterval(() => {
+  frame = (frame + 1) % 3;
+  sprite.style.backgroundPosition = `${-frame * frameW}px 0px`;
+}, 200);
+
+// Fade in on scroll
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.15 });
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>rouzeris@home:~$</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --green: #39ff14;
+  --dim-green: #1a7a0a;
+  --dark-green: #0d3d05;
+  --bg: #0a0a0a;
+  --amber: #ffbf00;
+  --red: #ff3333;
+}
+html {
+  font-family: 'IBM Plex Mono', monospace;
+  background: var(--bg);
+  color: var(--green);
+  font-size: 14px;
+  line-height: 1.6;
+}
+body { overflow-x: hidden; }
+
+/* CRT effect */
+.crt {
+  position: relative;
+  min-height: 100vh;
+  padding: 30px;
+}
+.crt::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0,0,0,0.15) 0px,
+    rgba(0,0,0,0.15) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  pointer-events: none;
+  z-index: 1000;
+}
+.crt::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.6) 100%);
+  pointer-events: none;
+  z-index: 999;
+}
+
+.terminal {
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+/* Glow text */
+.glow { text-shadow: 0 0 5px var(--green), 0 0 20px rgba(57,255,20,0.3); }
+.glow-amber { color: var(--amber); text-shadow: 0 0 5px var(--amber), 0 0 20px rgba(255,191,0,0.3); }
+
+/* Header */
+.header {
+  margin-bottom: 40px;
+  white-space: pre-wrap;
+}
+.ascii-art {
+  color: var(--green);
+  font-size: 10px;
+  line-height: 1.2;
+  margin-bottom: 16px;
+  opacity: 0.8;
+}
+.prompt { color: var(--dim-green); }
+.prompt .user { color: var(--green); }
+.prompt .path { color: var(--amber); }
+.cursor {
+  display: inline-block;
+  width: 8px;
+  height: 14px;
+  background: var(--green);
+  animation: blink 1s step-end infinite;
+  vertical-align: text-bottom;
+  margin-left: 2px;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* Command blocks */
+.cmd-block {
+  margin: 30px 0;
+  opacity: 0;
+  animation: typeIn 0.3s forwards;
+}
+.cmd-block:nth-child(2) { animation-delay: 0.2s; }
+.cmd-block:nth-child(3) { animation-delay: 0.5s; }
+.cmd-block:nth-child(4) { animation-delay: 0.8s; }
+.cmd-block:nth-child(5) { animation-delay: 1.1s; }
+.cmd-block:nth-child(6) { animation-delay: 1.4s; }
+@keyframes typeIn { to { opacity: 1; } }
+
+.cmd {
+  margin-bottom: 8px;
+}
+.cmd-text { color: white; }
+.output {
+  padding-left: 0;
+  margin-top: 8px;
+}
+.comment { color: var(--dim-green); font-style: italic; }
+
+/* Anime list */
+.file-list {
+  list-style: none;
+}
+.file-list li {
+  padding: 3px 0;
+  display: flex;
+  gap: 16px;
+}
+.file-list li .perms { color: var(--dim-green); }
+.file-list li .size { color: var(--amber); min-width: 50px; text-align: right; }
+.file-list li .name { color: var(--green); }
+.file-list li .name:hover { color: white; cursor: pointer; }
+
+/* Spotify */
+.playlist {
+  border: 1px solid var(--dark-green);
+  padding: 12px;
+  margin-top: 8px;
+}
+.track-line {
+  display: flex;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(57,255,20,0.1);
+}
+.track-line:last-child { border: none; }
+.track-num { color: var(--dim-green); min-width: 24px; }
+.track-bar {
+  width: 20px;
+  height: 14px;
+  display: inline-flex;
+  gap: 1px;
+  align-items: flex-end;
+  vertical-align: middle;
+}
+.track-bar span {
+  width: 3px;
+  background: var(--green);
+  animation: eq 0.5s ease-in-out infinite alternate;
+}
+.track-bar span:nth-child(1) { height: 6px; animation-delay: 0s; }
+.track-bar span:nth-child(2) { height: 10px; animation-delay: 0.15s; }
+.track-bar span:nth-child(3) { height: 4px; animation-delay: 0.3s; }
+@keyframes eq { to { height: 14px; } }
+.track-title { color: white; }
+.track-artist { color: var(--dim-green); }
+
+/* Gallery */
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+.gallery-file {
+  border: 1px solid var(--dark-green);
+  padding: 10px;
+  aspect-ratio: 4/3;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s;
+}
+.gallery-file:hover { border-color: var(--green); }
+.gallery-file .preview {
+  position: absolute;
+  inset: 0;
+  opacity: 0.15;
+}
+.gallery-file .fname { font-size: 12px; position: relative; z-index: 1; }
+.gallery-file .fsize { font-size: 10px; color: var(--dim-green); position: relative; z-index: 1; }
+
+/* Cat */
+.cat-terminal {
+  position: fixed;
+  bottom: 30px;
+  left: 30px;
+  z-index: 500;
+  image-rendering: pixelated;
+}
+.cat-sprite {
+  width: 96px; height: 96px;
+  background-image: url('https://rosiownia-eta.vercel.app/sprites/catplayer/atlas.png');
+  background-size: calc(288px * 3) calc(704px * 3);
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+  filter: hue-rotate(80deg) saturate(2) brightness(0.8);
+}
+
+/* Links */
+.links { margin-top: 8px; }
+.links a {
+  color: var(--amber);
+  text-decoration: none;
+  border-bottom: 1px solid var(--dark-green);
+  transition: color 0.3s;
+}
+.links a:hover { color: var(--green); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--dark-green); }
+
+@media (max-width: 600px) {
+  .crt { padding: 16px; }
+  html { font-size: 12px; }
+  .ascii-art { font-size: 6px; }
+  .gallery-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="crt">
+<div class="terminal">
+
+<div class="header">
+<pre class="ascii-art glow">
+ ____   ___  _   _ __________ ___ ___ ____
+|  _ \ / _ \| | | |__  / ____|  _ \_ _/ ___|
+| |_) | | | | | | | / /|  _| | |_) | |\___ \
+|  _ <| |_| | |_| |/ /_| |___|  _ < | | ___) |
+|_| \_\\___/ \___//____|_____|_| \_\___|____/
+</pre>
+<div class="comment"># artist · jewelry maker · developer</div>
+<div class="comment"># last login: Thu Feb 12 08:19:00 2026 from localhost</div>
+<br>
+<div><span class="prompt"><span class="user">rouzeris</span>@<span class="path">home</span>:~$ </span><span class="cmd-text">whoami</span></div>
+<div>Rosia (Rouzeris) — 21 y/o Ukrainian creative. I make art, jewelry, and AI apps.</div>
+<div>My cat Yuma (white Maine Coon) approves this terminal.</div>
+</div>
+
+<div class="cmd-block">
+<div class="cmd"><span class="prompt"><span class="user">rouzeris</span>@<span class="path">home</span>:~$ </span><span class="cmd-text">ls -la anime/</span></div>
+<div class="output">
+<div class="comment"># current watchlist — sorted by vibe</div>
+<ul class="file-list">
+  <li><span class="perms">drwxr-x</span><span class="size">24ep</span><span class="name">Spy_x_Family/</span></li>
+  <li><span class="perms">drwxr-x</span><span class="size">12ep</span><span class="name">Chainsaw_Man/</span></li>
+  <li><span class="perms">drwxr-x</span><span class="size">48ep</span><span class="name">Jujutsu_Kaisen/</span></li>
+  <li><span class="perms">drwxr-x</span><span class="size">12ep</span><span class="name">My_Dress-Up_Darling/</span></li>
+  <li><span class="perms">drwxr-x</span><span class="size">12ep</span><span class="name">Bocchi_the_Rock!/</span></li>
+  <li><span class="perms">drwxr-x</span><span class="size">28ep</span><span class="name">Frieren/</span></li>
+  <li><span class="perms">drwxr-x</span><span class="size">13ep</span><span class="name">Violet_Evergarden/</span></li>
+  <li><span class="perms">drwxr-x</span><span class="size">87ep</span><span class="name">Attack_on_Titan/</span></li>
+</ul>
+</div>
+</div>
+
+<div class="cmd-block">
+<div class="cmd"><span class="prompt"><span class="user">rouzeris</span>@<span class="path">home</span>:~$ </span><span class="cmd-text">cat spotify.playlist</span></div>
+<div class="output">
+<div class="playlist">
+  <div class="track-line"><span class="track-num">01</span><div class="track-bar"><span></span><span></span><span></span></div><span class="track-title">Тримай Мене</span><span class="track-artist"> — Один в Каное</span></div>
+  <div class="track-line"><span class="track-num">02</span><div class="track-bar"><span></span><span></span><span></span></div><span class="track-title">Motion Sickness</span><span class="track-artist"> — Phoebe Bridgers</span></div>
+  <div class="track-line"><span class="track-num">03</span><div class="track-bar"><span></span><span></span><span></span></div><span class="track-title">Stefania</span><span class="track-artist"> — Kalush Orchestra</span></div>
+  <div class="track-line"><span class="track-num">04</span><div class="track-bar"><span></span><span></span><span></span></div><span class="track-title">Dissolve</span><span class="track-artist"> — Absofacto</span></div>
+  <div class="track-line"><span class="track-num">05</span><div class="track-bar"><span></span><span></span><span></span></div><span class="track-title">Плакала</span><span class="track-artist"> — KAZKA</span></div>
+  <div class="track-line"><span class="track-num">06</span><div class="track-bar"><span></span><span></span><span></span></div><span class="track-title">Line Without a Hook</span><span class="track-artist"> — Ricky Montgomery</span></div>
+</div>
+</div>
+</div>
+
+<div class="cmd-block">
+<div class="cmd"><span class="prompt"><span class="user">rouzeris</span>@<span class="path">home</span>:~$ </span><span class="cmd-text">open gallery/</span></div>
+<div class="output">
+<div class="comment"># opening file browser...</div>
+<div class="gallery-grid">
+  <div class="gallery-file"><div class="preview" style="background: linear-gradient(180deg, #ff6b35, #ffd700);"></div><div class="fname">sunset_painting.png</div><div class="fsize">2.4 MB</div></div>
+  <div class="gallery-file"><div class="preview" style="background: linear-gradient(135deg, #333, #888);"></div><div class="fname">portrait_study.png</div><div class="fsize">1.8 MB</div></div>
+  <div class="gallery-file"><div class="preview" style="background: linear-gradient(135deg, #ffd700, #b8860b);"></div><div class="fname">jewelry_collection.jpg</div><div class="fsize">3.1 MB</div></div>
+  <div class="gallery-file"><div class="preview" style="background: linear-gradient(180deg, #4a90d9, #1a1a3e);"></div><div class="fname">city_at_dusk.png</div><div class="fsize">2.7 MB</div></div>
+  <div class="gallery-file"><div class="preview" style="background: linear-gradient(135deg, #ff69b4, #c71585);"></div><div class="fname">floral_ring.jpg</div><div class="fsize">1.2 MB</div></div>
+  <div class="gallery-file"><div class="preview" style="background: linear-gradient(135deg, #228b22, #2e8b57);"></div><div class="fname">nature_sketch.png</div><div class="fsize">900 KB</div></div>
+</div>
+</div>
+</div>
+
+<div class="cmd-block">
+<div class="cmd"><span class="prompt"><span class="user">rouzeris</span>@<span class="path">home</span>:~$ </span><span class="cmd-text">cat links.txt</span></div>
+<div class="output links">
+<div>instagram: <a href="https://instagram.com/roksolanas_7" target="_blank">@roksolanas_7</a> (art + life)</div>
+<div>instagram: <a href="https://instagram.com/jumabestia" target="_blank">@jumabestia</a> (yuma the maine coon)</div>
+</div>
+</div>
+
+<div class="cmd-block">
+<div class="cmd"><span class="prompt"><span class="user">rouzeris</span>@<span class="path">home</span>:~$ </span><span class="cursor"></span></div>
+</div>
+
+<div style="height: 120px;"></div>
+
+</div>
+</div>
+
+<div class="cat-terminal" id="cat">
+  <div class="cat-sprite" id="catSprite"></div>
+</div>
+
+<script>
+const sprite = document.getElementById('catSprite');
+let frame = 0;
+setInterval(() => {
+  frame = (frame + 1) % 3;
+  sprite.style.backgroundPosition = `${-frame * 96}px ${-96}px`;
+}, 200);
+</script>
+</body>
+</html>

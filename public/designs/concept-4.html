@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rouzeris ☁️</title>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,500;1,300;1,500&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --pink: #f8c8dc;
+  --lavender: #d8c4e8;
+  --mint: #b8e8d0;
+  --cream: #fef6f0;
+  --soft-pink: #fff0f5;
+  --text: #5a4a5e;
+  --text-light: #9a8a9e;
+  --shadow: rgba(200,180,220,0.25);
+}
+html {
+  font-family: 'Quicksand', sans-serif;
+  background: var(--cream);
+  color: var(--text);
+  scroll-behavior: smooth;
+}
+body { overflow-x: hidden; }
+
+/* Atmospheric background */
+.bg-clouds {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(ellipse at 20% 20%, rgba(248,200,220,0.4) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 60%, rgba(216,196,232,0.3) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 90%, rgba(184,232,208,0.3) 0%, transparent 50%),
+    var(--cream);
+}
+/* Floating cloud shapes */
+.cloud {
+  position: fixed;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.5);
+  filter: blur(40px);
+  z-index: -1;
+  animation: floatCloud 20s ease-in-out infinite;
+}
+.cloud:nth-child(1) { width: 300px; height: 150px; top: 10%; left: 5%; animation-delay: 0s; }
+.cloud:nth-child(2) { width: 200px; height: 100px; top: 40%; right: 10%; animation-delay: -7s; animation-duration: 25s; }
+.cloud:nth-child(3) { width: 250px; height: 120px; bottom: 20%; left: 30%; animation-delay: -14s; animation-duration: 22s; }
+@keyframes floatCloud {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  33% { transform: translateY(-20px) translateX(10px); }
+  66% { transform: translateY(10px) translateX(-10px); }
+}
+
+/* Header */
+.header {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 40px;
+}
+.header h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(3.5rem, 10vw, 8rem);
+  font-weight: 300;
+  letter-spacing: 0.08em;
+  color: var(--text);
+  line-height: 1;
+}
+.header .subtitle {
+  font-size: 1rem;
+  font-weight: 300;
+  letter-spacing: 0.3em;
+  color: var(--text-light);
+  margin-top: 16px;
+}
+
+/* Section styling */
+.section {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 80px 30px;
+}
+.section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.5rem;
+  font-weight: 300;
+  font-style: italic;
+  text-align: center;
+  margin-bottom: 40px;
+  color: var(--text);
+}
+
+/* Cards */
+.card {
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(10px);
+  border-radius: 24px;
+  padding: 32px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 24px var(--shadow);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 40px var(--shadow);
+}
+
+/* Anime */
+.anime-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+}
+.anime-pill {
+  background: linear-gradient(135deg, var(--soft-pink), rgba(216,196,232,0.3));
+  border-radius: 16px;
+  padding: 16px 20px;
+  text-align: center;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: all 0.3s;
+  border: 1px solid rgba(255,255,255,0.5);
+}
+.anime-pill:hover {
+  background: linear-gradient(135deg, var(--pink), var(--lavender));
+  transform: scale(1.03);
+}
+.anime-pill .stars {
+  font-size: 0.7rem;
+  color: var(--text-light);
+  margin-top: 6px;
+}
+
+/* Spotify */
+.song-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(200,180,220,0.15);
+  transition: background 0.3s;
+  border-radius: 12px;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+.song-row:hover { background: rgba(248,200,220,0.2); }
+.song-row:last-child { border: none; }
+.song-art {
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+.song-title { font-weight: 600; font-size: 0.95rem; }
+.song-artist { font-size: 0.8rem; color: var(--text-light); margin-top: 2px; }
+
+/* Gallery */
+.gallery-masonry {
+  columns: 3;
+  column-gap: 16px;
+}
+.gallery-item {
+  break-inside: avoid;
+  margin-bottom: 16px;
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  transition: transform 0.4s;
+}
+.gallery-item:hover { transform: scale(1.02); }
+.gallery-item .placeholder {
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  padding: 16px;
+}
+.gallery-item span {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: white;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.4);
+  background: rgba(0,0,0,0.15);
+  padding: 4px 12px;
+  border-radius: 99px;
+  backdrop-filter: blur(4px);
+}
+
+/* Links */
+.links-row {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.link-btn {
+  display: inline-block;
+  padding: 14px 28px;
+  border-radius: 99px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text);
+  background: linear-gradient(135deg, rgba(248,200,220,0.5), rgba(216,196,232,0.5));
+  border: 1px solid rgba(255,255,255,0.6);
+  transition: all 0.3s;
+  box-shadow: 0 2px 12px var(--shadow);
+}
+.link-btn:hover {
+  background: linear-gradient(135deg, var(--pink), var(--lavender));
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px var(--shadow);
+}
+
+/* Cat */
+.cat-float {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 100;
+  image-rendering: pixelated;
+  animation: catBounce 3s ease-in-out infinite;
+}
+@keyframes catBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+.cat-sprite {
+  width: 96px; height: 96px;
+  background-image: url('https://rosiownia-eta.vercel.app/sprites/catplayer/atlas.png');
+  background-size: calc(288px * 3) calc(704px * 3);
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+}
+
+/* Scroll reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 40px;
+  font-size: 0.8rem;
+  color: var(--text-light);
+  letter-spacing: 0.1em;
+}
+
+@media (max-width: 600px) {
+  .anime-grid { grid-template-columns: 1fr 1fr; }
+  .gallery-masonry { columns: 2; }
+  .section { padding: 50px 16px; }
+}
+</style>
+</head>
+<body>
+
+<div class="bg-clouds"></div>
+<div class="cloud"></div>
+<div class="cloud"></div>
+<div class="cloud"></div>
+
+<div class="header reveal">
+  <h1>Rouzeris</h1>
+  <p class="subtitle">artist · jewelry maker · developer</p>
+</div>
+
+<div class="section reveal">
+  <div class="section-title">watching ✨</div>
+  <div class="card">
+    <div class="anime-grid">
+      <div class="anime-pill">Spy × Family<div class="stars">♡♡♡♡♡</div></div>
+      <div class="anime-pill">Chainsaw Man<div class="stars">♡♡♡♡♡</div></div>
+      <div class="anime-pill">Jujutsu Kaisen<div class="stars">♡♡♡♡</div></div>
+      <div class="anime-pill">My Dress-Up Darling<div class="stars">♡♡♡♡♡</div></div>
+      <div class="anime-pill">Bocchi the Rock!<div class="stars">♡♡♡♡♡</div></div>
+      <div class="anime-pill">Frieren<div class="stars">♡♡♡♡♡</div></div>
+      <div class="anime-pill">Violet Evergarden<div class="stars">♡♡♡♡♡</div></div>
+      <div class="anime-pill">Attack on Titan<div class="stars">♡♡♡♡</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="section reveal">
+  <div class="section-title">listening ♪</div>
+  <div class="card">
+    <div class="song-row">
+      <div class="song-art" style="background: linear-gradient(135deg, #e8a0b0, #d06070); border-radius: 12px;"></div>
+      <div><div class="song-title">Тримай Мене</div><div class="song-artist">Один в Каное</div></div>
+    </div>
+    <div class="song-row">
+      <div class="song-art" style="background: linear-gradient(135deg, #a0c4e8, #6090b8); border-radius: 12px;"></div>
+      <div><div class="song-title">Motion Sickness</div><div class="song-artist">Phoebe Bridgers</div></div>
+    </div>
+    <div class="song-row">
+      <div class="song-art" style="background: linear-gradient(135deg, #e8d0a0, #c8a060); border-radius: 12px;"></div>
+      <div><div class="song-title">Stefania</div><div class="song-artist">Kalush Orchestra</div></div>
+    </div>
+    <div class="song-row">
+      <div class="song-art" style="background: linear-gradient(135deg, #a0e8c4, #60b890); border-radius: 12px;"></div>
+      <div><div class="song-title">Dissolve</div><div class="song-artist">Absofacto</div></div>
+    </div>
+    <div class="song-row">
+      <div class="song-art" style="background: linear-gradient(135deg, #c8a0e8, #9060b8); border-radius: 12px;"></div>
+      <div><div class="song-title">Плакала</div><div class="song-artist">KAZKA</div></div>
+    </div>
+    <div class="song-row">
+      <div class="song-art" style="background: linear-gradient(135deg, #e8c0d8, #b890a8); border-radius: 12px;"></div>
+      <div><div class="song-title">Line Without a Hook</div><div class="song-artist">Ricky Montgomery</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="section reveal">
+  <div class="section-title">gallery 🎨</div>
+  <div class="gallery-masonry">
+    <div class="gallery-item"><div class="placeholder" style="height: 200px; background: linear-gradient(180deg, #ffb088, #ff7854);"><span>sunset painting</span></div></div>
+    <div class="gallery-item"><div class="placeholder" style="height: 260px; background: linear-gradient(135deg, #555, #999);"><span>portrait study</span></div></div>
+    <div class="gallery-item"><div class="placeholder" style="height: 180px; background: linear-gradient(135deg, #ffd700, #daa520);"><span>jewelry collection</span></div></div>
+    <div class="gallery-item"><div class="placeholder" style="height: 240px; background: linear-gradient(180deg, #87ceeb, #2c3e80);"><span>city at dusk</span></div></div>
+    <div class="gallery-item"><div class="placeholder" style="height: 160px; background: linear-gradient(135deg, #ff69b4, #c71585);"><span>floral ring</span></div></div>
+    <div class="gallery-item"><div class="placeholder" style="height: 220px; background: linear-gradient(135deg, #66bb6a, #2e7d32);"><span>nature sketch</span></div></div>
+  </div>
+</div>
+
+<div class="section reveal" style="text-align: center;">
+  <div class="section-title">find me ☁️</div>
+  <div class="links-row">
+    <a class="link-btn" href="https://instagram.com/roksolanas_7" target="_blank">📸 @roksolanas_7</a>
+    <a class="link-btn" href="https://instagram.com/jumabestia" target="_blank">🐱 @jumabestia</a>
+  </div>
+</div>
+
+<div class="footer">made with ♡ by rouzeris · yuma says meow</div>
+
+<div class="cat-float" id="cat">
+  <div class="cat-sprite" id="catSprite"></div>
+</div>
+
+<script>
+// Cat idle animation
+const sprite = document.getElementById('catSprite');
+let frame = 0;
+setInterval(() => {
+  frame = (frame + 1) % 3;
+  // idle left (facing viewer)
+  sprite.style.backgroundPosition = `${-frame * 96}px ${-96}px`;
+}, 200);
+
+// Scroll reveal
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('show'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>

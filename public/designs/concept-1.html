@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rouzeris — Cozy Pixel Room</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --cream: #f5e6c8;
+  --brown: #8b6914;
+  --dark-brown: #5c3d0e;
+  --warm-bg: #2a1f0e;
+  --wood: #a0703c;
+  --wood-dark: #6b4c28;
+  --pixel-border: 3px solid #3d2b10;
+  --light: #ffe4a8;
+}
+html { font-family: 'Press Start 2P', monospace; background: var(--warm-bg); color: var(--cream); font-size: 10px; scroll-behavior: smooth; }
+body { overflow-x: hidden; }
+
+/* Room container */
+.room {
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #1a120a 0%, #2a1f0e 30%, #3d2b10 100%);
+}
+
+/* Wallpaper pattern */
+.room::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(90deg, transparent, transparent 48px, rgba(255,228,168,0.03) 48px, rgba(255,228,168,0.03) 50px),
+    repeating-linear-gradient(0deg, transparent, transparent 48px, rgba(255,228,168,0.03) 48px, rgba(255,228,168,0.03) 50px);
+  pointer-events: none;
+}
+
+/* Header / Name plate */
+.nameplate {
+  text-align: center;
+  padding: 40px 20px 20px;
+  position: relative;
+}
+.nameplate h1 {
+  font-size: 3.2rem;
+  color: var(--light);
+  text-shadow: 4px 4px 0 var(--dark-brown), -1px -1px 0 rgba(255,228,168,0.3);
+  letter-spacing: 0.1em;
+  image-rendering: pixelated;
+}
+.nameplate p {
+  font-size: 0.9rem;
+  color: var(--brown);
+  margin-top: 12px;
+  letter-spacing: 0.15em;
+}
+
+/* Floor */
+.floor {
+  position: relative;
+  padding: 0 20px;
+}
+
+/* Furniture items */
+.furniture {
+  position: relative;
+  margin: 40px auto;
+  max-width: 700px;
+  border: var(--pixel-border);
+  background: rgba(160,112,60,0.15);
+  padding: 20px;
+  image-rendering: pixelated;
+}
+.furniture::before {
+  content: '';
+  position: absolute;
+  bottom: -8px; left: 8px; right: -8px; top: 8px;
+  background: rgba(0,0,0,0.3);
+  z-index: -1;
+}
+.furniture-label {
+  font-size: 0.8rem;
+  color: var(--light);
+  background: var(--dark-brown);
+  display: inline-block;
+  padding: 6px 12px;
+  margin-bottom: 16px;
+  border: 2px solid var(--brown);
+}
+
+/* TV = Anime */
+.tv {
+  background: #1a120a;
+  border: 6px solid var(--wood-dark);
+  border-radius: 0;
+  position: relative;
+}
+.tv .screen {
+  background: linear-gradient(135deg, #0f1a2e, #1a2a3e);
+  border: 3px solid #444;
+  padding: 16px;
+  margin: 12px;
+}
+.tv .antenna { display: flex; justify-content: center; gap: 20px; margin-bottom: -6px; position: relative; z-index: 1; }
+.tv .antenna span { display: block; width: 4px; height: 30px; background: var(--wood-dark); transform-origin: bottom; }
+.tv .antenna span:first-child { transform: rotate(-20deg); }
+.tv .antenna span:last-child { transform: rotate(20deg); }
+
+.anime-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px;
+}
+.anime-item {
+  background: rgba(255,228,168,0.08);
+  border: 1px solid rgba(255,228,168,0.15);
+  padding: 8px;
+  font-size: 0.65rem;
+  line-height: 1.6;
+  color: var(--cream);
+  text-align: center;
+  transition: background 0.2s;
+}
+.anime-item:hover { background: rgba(255,228,168,0.15); }
+.anime-item .rating { color: var(--brown); font-size: 0.55rem; margin-top: 4px; }
+
+/* Radio = Spotify */
+.radio {
+  background: linear-gradient(180deg, var(--wood), var(--wood-dark));
+  border-radius: 0;
+  border: 4px solid var(--dark-brown);
+}
+.radio .dial {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  padding: 10px;
+}
+.radio .dial span {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--dark-brown);
+  border: 2px solid var(--brown);
+}
+.song-list { padding: 12px; }
+.song {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255,228,168,0.1);
+  font-size: 0.7rem;
+}
+.song:last-child { border: none; }
+.song-art {
+  width: 36px; height: 36px;
+  flex-shrink: 0;
+  image-rendering: pixelated;
+}
+.song-info .title { color: var(--light); }
+.song-info .artist { color: var(--brown); font-size: 0.6rem; margin-top: 4px; }
+
+/* Easel = Art */
+.easel {
+  background: transparent;
+  border: none;
+}
+.easel::before { display: none; }
+.easel .canvas-frame {
+  background: var(--warm-bg);
+  border: 8px solid var(--wood);
+  padding: 16px;
+  position: relative;
+}
+.easel .legs {
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+}
+.easel .legs span {
+  width: 6px;
+  height: 50px;
+  background: var(--wood-dark);
+  display: block;
+}
+.easel .legs span:first-child { transform: rotate(-8deg); }
+.easel .legs span:last-child { transform: rotate(8deg); }
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+}
+.gallery-item {
+  aspect-ratio: 4/3;
+  display: flex;
+  align-items: flex-end;
+  padding: 8px;
+  font-size: 0.6rem;
+  color: white;
+  text-shadow: 1px 1px 0 #000;
+  border: 2px solid rgba(255,228,168,0.1);
+}
+
+/* Jewelry box */
+.jewelry-box {
+  background: linear-gradient(180deg, #8b6914, #6b4c28);
+  border: 4px solid #3d2b10;
+  position: relative;
+}
+.jewelry-box .lid {
+  background: linear-gradient(180deg, #a0703c, #8b6914);
+  height: 20px;
+  border-bottom: 3px solid #5c3d0e;
+}
+
+/* Links shelf */
+.shelf {
+  background: var(--wood);
+  border: 3px solid var(--wood-dark);
+  padding: 16px;
+  text-align: center;
+}
+.shelf a {
+  color: var(--light);
+  text-decoration: none;
+  font-size: 0.75rem;
+  display: inline-block;
+  margin: 8px 16px;
+  padding: 6px 12px;
+  border: 2px solid var(--brown);
+  transition: all 0.2s;
+}
+.shelf a:hover {
+  background: var(--dark-brown);
+  color: white;
+}
+
+/* Cat sprite */
+.cat-container {
+  position: fixed;
+  bottom: 0;
+  left: 50px;
+  width: 96px;
+  height: 96px;
+  z-index: 100;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+.cat-sprite {
+  width: 96px;
+  height: 96px;
+  background-image: url('https://rosiownia-eta.vercel.app/sprites/catplayer/atlas.png');
+  background-size: calc(288px * 3) calc(704px * 3);
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .nameplate h1 { font-size: 2rem; }
+  .anime-grid { grid-template-columns: repeat(2, 1fr); }
+  .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+  .furniture { margin: 24px 10px; padding: 12px; }
+}
+</style>
+</head>
+<body>
+
+<div class="room">
+  <div class="nameplate">
+    <h1>Rouzeris</h1>
+    <p>artist · jewelry maker · developer</p>
+  </div>
+
+  <div class="floor">
+
+    <!-- TV = Anime -->
+    <div class="furniture tv">
+      <div class="antenna"><span></span><span></span></div>
+      <div class="screen">
+        <div class="furniture-label">📺 now watching</div>
+        <div class="anime-grid">
+          <div class="anime-item">Spy x Family<div class="rating">★★★★★</div></div>
+          <div class="anime-item">Chainsaw Man<div class="rating">★★★★★</div></div>
+          <div class="anime-item">Jujutsu Kaisen<div class="rating">★★★★☆</div></div>
+          <div class="anime-item">My Dress-Up Darling<div class="rating">★★★★★</div></div>
+          <div class="anime-item">Bocchi the Rock!<div class="rating">★★★★★</div></div>
+          <div class="anime-item">Frieren<div class="rating">★★★★★</div></div>
+          <div class="anime-item">Violet Evergarden<div class="rating">★★★★★</div></div>
+          <div class="anime-item">Attack on Titan<div class="rating">★★★★☆</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Radio = Spotify -->
+    <div class="furniture radio">
+      <div class="dial"><span></span><span></span><span></span></div>
+      <div class="furniture-label">🎵 on repeat</div>
+      <div class="song-list">
+        <div class="song">
+          <div class="song-art" style="background: linear-gradient(135deg, #e74c3c, #8e44ad);"></div>
+          <div class="song-info"><div class="title">Тримай Мене</div><div class="artist">Один в Каное</div></div>
+        </div>
+        <div class="song">
+          <div class="song-art" style="background: linear-gradient(135deg, #2ecc71, #1abc9c);"></div>
+          <div class="song-info"><div class="title">Motion Sickness</div><div class="artist">Phoebe Bridgers</div></div>
+        </div>
+        <div class="song">
+          <div class="song-art" style="background: linear-gradient(135deg, #f39c12, #e67e22);"></div>
+          <div class="song-info"><div class="title">Stefania</div><div class="artist">Kalush Orchestra</div></div>
+        </div>
+        <div class="song">
+          <div class="song-art" style="background: linear-gradient(135deg, #3498db, #2c3e50);"></div>
+          <div class="song-info"><div class="title">Dissolve</div><div class="artist">Absofacto</div></div>
+        </div>
+        <div class="song">
+          <div class="song-art" style="background: linear-gradient(135deg, #9b59b6, #e91e63);"></div>
+          <div class="song-info"><div class="title">Плакала</div><div class="artist">KAZKA</div></div>
+        </div>
+        <div class="song">
+          <div class="song-art" style="background: linear-gradient(135deg, #1a1a2e, #16213e);"></div>
+          <div class="song-info"><div class="title">Line Without a Hook</div><div class="artist">Ricky Montgomery</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Easel = Art -->
+    <div class="furniture easel">
+      <div class="canvas-frame">
+        <div class="furniture-label">🎨 gallery</div>
+        <div class="gallery-grid">
+          <div class="gallery-item" style="background: linear-gradient(180deg, #ff6b35, #ffa07a, #ffd700);">sunset painting</div>
+          <div class="gallery-item" style="background: linear-gradient(135deg, #2c2c2c, #555, #888);">portrait study</div>
+          <div class="gallery-item" style="background: linear-gradient(135deg, #ffd700, #daa520, #b8860b);">jewelry collection</div>
+          <div class="gallery-item" style="background: linear-gradient(180deg, #87ceeb, #4a90d9, #2c3e50);">city at dusk</div>
+          <div class="gallery-item" style="background: linear-gradient(135deg, #ff69b4, #ff1493, #c71585);">floral ring</div>
+          <div class="gallery-item" style="background: linear-gradient(135deg, #228b22, #006400, #2e8b57);">nature sketch</div>
+        </div>
+      </div>
+      <div class="legs"><span></span><span></span></div>
+    </div>
+
+    <!-- Jewelry Box -->
+    <div class="furniture jewelry-box">
+      <div class="lid"></div>
+      <div style="padding: 16px;">
+        <div class="furniture-label">💎 jewelry</div>
+        <div class="gallery-grid">
+          <div class="gallery-item" style="background: linear-gradient(135deg, #c0c0c0, #e8e8e8, #a0a0a0);">silver pendant</div>
+          <div class="gallery-item" style="background: linear-gradient(135deg, #ffd700, #ffec8b, #daa520);">gold earrings</div>
+          <div class="gallery-item" style="background: linear-gradient(135deg, #e6e6fa, #dda0dd, #ba55d3);">amethyst ring</div>
+          <div class="gallery-item" style="background: linear-gradient(135deg, #40e0d0, #48d1cc, #00ced1);">turquoise bracelet</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Links Shelf -->
+    <div class="furniture shelf">
+      <div class="furniture-label">🔗 find me</div>
+      <br><br>
+      <a href="https://instagram.com/roksolanas_7" target="_blank">📸 @roksolanas_7</a>
+      <a href="https://instagram.com/jumabestia" target="_blank">🐱 @jumabestia (Yuma)</a>
+    </div>
+
+    <div style="height: 120px;"></div>
+  </div>
+</div>
+
+<div class="cat-container" id="cat">
+  <div class="cat-sprite" id="catSprite"></div>
+</div>
+
+<script>
+const cat = document.getElementById('cat');
+const sprite = document.getElementById('catSprite');
+const frameW = 32 * 3, frameH = 32 * 3;
+const atlasW = 288 * 3, atlasH = 704 * 3;
+
+let catX = 50, catDir = 1, catState = 'idle', frame = 0;
+let stateTimer = 0, animTimer = 0;
+const speed = 1.5;
+
+function setState(s) {
+  catState = s;
+  frame = 0;
+  animTimer = 0;
+  stateTimer = 0;
+}
+
+function pickNewState() {
+  if (Math.random() < 0.4) {
+    setState('idle');
+    stateTimer = 2000 + Math.random() * 3000;
+  } else {
+    catDir = Math.random() < 0.5 ? -1 : 1;
+    setState('walk');
+    stateTimer = 1500 + Math.random() * 3000;
+  }
+}
+
+pickNewState();
+let lastTime = performance.now();
+
+function update(now) {
+  const dt = now - lastTime;
+  lastTime = now;
+  animTimer += dt;
+  stateTimer -= dt;
+
+  if (stateTimer <= 0) pickNewState();
+
+  let row, frameDur, numFrames = 3;
+  if (catState === 'idle') {
+    row = catDir === 1 ? 0 : 1;
+    frameDur = 200;
+  } else {
+    row = catDir === 1 ? 2 : 3;
+    frameDur = 150;
+    catX += speed * catDir;
+    const maxX = window.innerWidth - 96;
+    if (catX < 0) { catX = 0; catDir = 1; row = 2; }
+    if (catX > maxX) { catX = maxX; catDir = -1; row = 3; }
+  }
+
+  if (animTimer >= frameDur) {
+    frame = (frame + 1) % numFrames;
+    animTimer = 0;
+  }
+
+  const bgX = -(frame * frameW);
+  const bgY = -(row * frameH);
+  sprite.style.backgroundPosition = `${bgX}px ${bgY}px`;
+  cat.style.left = catX + 'px';
+
+  requestAnimationFrame(update);
+}
+requestAnimationFrame(update);
+</script>
+</body>
+</html>
