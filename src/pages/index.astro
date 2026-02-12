@@ -7,7 +7,7 @@ import RPGCat from '../components/RPGCat'
   <main style="max-width: 1200px; margin: 0 auto; padding: 32px 20px 120px;">
     <div class="bento-grid">
       
-      <!-- Hero - spans 2 cols, 2 rows for prominence -->
+      <!-- Hero - spans 2 cols, 2 rows on desktop, 2 cols on mobile -->
       <div class="card hero-card" style="grid-column: span 2; grid-row: span 2;">
         <div style="padding: 48px 40px;">
           <h1 style="font-size: clamp(2.8rem, 6vw, 4.5rem); font-weight: 300; color: #3d2c1e; margin: 0; line-height: 1.1; letter-spacing: -0.02em;">Rouzeris</h1>
@@ -15,8 +15,8 @@ import RPGCat from '../components/RPGCat'
         </div>
       </div>
 
-      <!-- Instagram - tall card, 2 rows -->
-      <div class="card" style="grid-row: span 2;">
+      <!-- Instagram - tall card, 2 rows on desktop, spans 1 col on mobile -->
+      <div class="card instagram-card" style="grid-row: span 2;">
         <div style="padding: 24px;">
           <h2 class="card-title">📸 Instagram</h2>
           <div style="display: flex; flex-direction: column; gap: 16px; margin-top: 8px;">
@@ -32,8 +32,8 @@ import RPGCat from '../components/RPGCat'
         </div>
       </div>
 
-      <!-- Anime Library - 2 cols -->
-      <div class="card" style="grid-column: span 2; overflow: hidden;">
+      <!-- Anime Library - 2 cols on desktop -->
+      <div class="card anime-card" style="grid-column: span 2; overflow: hidden;">
         <div style="padding: 24px;">
           <h2 class="card-title">📺 Anime Library</h2>
           <div style="display: flex; gap: 14px; overflow-x: auto; padding-bottom: 8px; scroll-snap-type: x mandatory;">
@@ -57,7 +57,7 @@ import RPGCat from '../components/RPGCat'
       </div>
 
       <!-- Blog - 1 col -->
-      <div class="card">
+      <div class="card blog-card">
         <div style="padding: 24px;">
           <h2 class="card-title">📝 Blog</h2>
           <div style="display: flex; flex-direction: column; gap: 14px;">
@@ -77,7 +77,7 @@ import RPGCat from '../components/RPGCat'
       </div>
 
       <!-- Jewelry Gallery - 2 cols, 2 rows for visual impact -->
-      <div class="card" style="grid-column: span 2; grid-row: span 2;">
+      <div class="card jewelry-card" style="grid-column: span 2; grid-row: span 2;">
         <div style="padding: 24px;">
           <h2 class="card-title">💎 Jewelry</h2>
           <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
@@ -99,7 +99,7 @@ import RPGCat from '../components/RPGCat'
       </div>
 
       <!-- Spotify - 1 col, 2 rows -->
-      <div class="card" style="grid-row: span 2; overflow: hidden;">
+      <div class="card spotify-card" style="grid-row: span 2; overflow: hidden;">
         <div style="padding: 24px;">
           <h2 class="card-title">🎵 Listening</h2>
           <div style="display: flex; flex-direction: column; gap: 12px; overflow-y: auto; max-height: 400px;">
@@ -139,11 +139,36 @@ import RPGCat from '../components/RPGCat'
 
   @media (max-width: 768px) {
     .bento-grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      grid-auto-rows: minmax(120px, auto);
     }
-    .bento-grid > * {
+    
+    /* Let cards that span 2 cols stay full width on mobile */
+    .hero-card {
+      grid-column: span 2 !important;
+    }
+    
+    .anime-card {
+      grid-column: span 2 !important;
+    }
+    
+    .jewelry-card {
+      grid-column: span 2 !important;
+      grid-row: span 1 !important;
+    }
+    
+    /* Single column cards stay as 1 col */
+    .instagram-card,
+    .blog-card,
+    .spotify-card {
       grid-column: span 1 !important;
       grid-row: span 1 !important;
+    }
+    
+    /* Adjust jewelry grid for mobile */
+    .jewelry-card .jewelry-item {
+      font-size: 0.75rem;
     }
   }
 
