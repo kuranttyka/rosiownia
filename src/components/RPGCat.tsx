@@ -192,7 +192,8 @@ export default function RPGCat() {
         const distToCenter = Math.sqrt((tx - center.x) ** 2 + (ty - center.y) ** 2)
 
         if (tx < JOYSTICK_ZONE && ty > window.innerHeight - JOYSTICK_ZONE && !joystickRef.current.active) {
-          // Activate joystick
+          // Activate joystick — prevent scroll
+          e.preventDefault()
           const joy = joystickRef.current
           joy.active = true
           joy.touchId = touch.identifier
@@ -220,6 +221,7 @@ export default function RPGCat() {
     const handleTouchMove = (e: TouchEvent) => {
       const joy = joystickRef.current
       if (!joy.active) return
+      e.preventDefault()
       for (const touch of Array.from(e.changedTouches)) {
         if (touch.identifier !== joy.touchId) continue
         const center = joystickCenterRef.current
