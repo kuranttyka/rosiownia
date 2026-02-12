@@ -76,6 +76,7 @@ export default function RPGCat() {
     s.anim = 'attack'
     s.frame = 0
     s.frameTimer = 0
+    s.idleTimer = 0
     playPopSound()
   }, [])
 
@@ -136,6 +137,9 @@ export default function RPGCat() {
       if (moving) {
         newAnim = 'walk'
         s.idleTimer = 0
+      } else if (s.anim === 'sleep') {
+        // Stay asleep — only wake on user input (movement/click)
+        newAnim = 'sleep'
       } else {
         s.idleTimer += dt
         newAnim = s.idleTimer > 8000 ? 'sleep' : 'idle'
