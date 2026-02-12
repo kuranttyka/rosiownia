@@ -78,7 +78,7 @@ import RPGCat from '../components/RPGCat'
       <div class="card jewelry-card" style="grid-column: span 2; grid-row: span 2;">
         <div style="padding: 24px;">
           <h2 class="card-title">💎 Jewelry</h2>
-          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+          <div class="jewelry-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
             {[
               { name: 'silver ring', color: '#c8c0b8' },
               { name: 'pearl necklace', color: '#e8e0d4' },
@@ -137,20 +137,31 @@ import RPGCat from '../components/RPGCat'
 
   @media (max-width: 768px) {
     .bento-grid {
+      /* Mix of 1-col and 2-col where it makes sense */
       grid-template-columns: repeat(2, 1fr);
       gap: 12px;
-      grid-auto-rows: minmax(120px, auto);
+      grid-auto-rows: minmax(100px, auto);
     }
     
-    .bento-grid > * {
+    /* Full width cards */
+    .hero-card,
+    .anime-card,
+    .jewelry-card,
+    .spotify-card {
+      grid-column: span 2 !important;
+      grid-row: span 1 !important;
+    }
+    
+    /* Side by side: Instagram and Blog (small compact cards) */
+    .instagram-card,
+    .blog-card {
       grid-column: span 1 !important;
       grid-row: span 1 !important;
     }
     
-    .hero-card,
-    .anime-card,
-    .jewelry-card {
-      grid-column: span 2 !important;
+    /* Jewelry grid adjustment for mobile */
+    .jewelry-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
     }
   }
 
