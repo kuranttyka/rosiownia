@@ -15,11 +15,11 @@ import RPGCat from '../components/RPGCat'
         </div>
       </div>
 
-      <!-- Anime Library (tall) -->
-      <div class="card" style="grid-row: span 2; overflow: hidden;">
+      <!-- Anime Library (horizontal scroll) -->
+      <div class="card" style="grid-column: span 2; overflow: hidden;">
         <div style="padding: 24px;">
           <h2 class="card-title">📺 Anime Library</h2>
-          <div style="display: flex; flex-direction: column; gap: 10px; max-height: 380px; overflow-y: auto; padding-right: 4px;">
+          <div style="display: flex; gap: 14px; overflow-x: auto; padding-bottom: 8px; scroll-snap-type: x mandatory;">
             {[
               { title: 'Spy x Family', color: '#e8c4c4' },
               { title: 'Chainsaw Man', color: '#c4c4e8' },
@@ -30,9 +30,9 @@ import RPGCat from '../components/RPGCat'
               { title: 'Violet Evergarden', color: '#d8c4e8' },
               { title: 'Attack on Titan', color: '#e8c4c4' },
             ].map((anime) => (
-              <div style={`display: flex; align-items: center; gap: 10px;`}>
-                <div style={`width: 40px; height: 56px; border-radius: 6px; background: ${anime.color}; flex-shrink: 0;`}></div>
-                <span style="font-size: 0.95rem; color: #3d2c1e;">{anime.title}</span>
+              <div style="flex-shrink: 0; width: 120px; scroll-snap-align: start;">
+                <div style={`width: 120px; height: 170px; border-radius: 8px; background: ${anime.color};`}></div>
+                <span style="font-size: 0.85rem; color: #3d2c1e; display: block; margin-top: 6px; line-height: 1.2;">{anime.title}</span>
               </div>
             ))}
           </div>
@@ -61,11 +61,11 @@ import RPGCat from '../components/RPGCat'
         </div>
       </div>
 
-      <!-- Spotify -->
-      <div class="card">
+      <!-- Spotify (horizontal scroll) -->
+      <div class="card" style="grid-column: span 2; overflow: hidden;">
         <div style="padding: 24px;">
           <h2 class="card-title">🎵 Listening</h2>
-          <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; gap: 14px; overflow-x: auto; padding-bottom: 8px; scroll-snap-type: x mandatory;">
             {[
               { track: 'Stefania', artist: 'Kalush Orchestra', color: '#e8c4a4' },
               { track: 'Щедрик', artist: 'Pentatonix', color: '#a4c4e8' },
@@ -74,10 +74,10 @@ import RPGCat from '../components/RPGCat'
               { track: 'Homura', artist: 'LiSA', color: '#a4e8c4' },
               { track: 'おまえのドリーム', artist: 'TATSURO', color: '#e8d8a4' },
             ].map((song) => (
-              <div style="display: flex; align-items: center; gap: 10px;">
-                <div style={`width: 36px; height: 36px; border-radius: 6px; background: ${song.color}; flex-shrink: 0;`}></div>
-                <div style="min-width: 0;">
-                  <div style="font-size: 0.88rem; color: #3d2c1e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{song.track}</div>
+              <div style="flex-shrink: 0; width: 120px; scroll-snap-align: start;">
+                <div style={`width: 120px; height: 120px; border-radius: 8px; background: ${song.color};`}></div>
+                <div style="margin-top: 6px;">
+                  <div style="font-size: 0.85rem; color: #3d2c1e; line-height: 1.2;">{song.track}</div>
                   <div style="font-size: 0.75rem; color: #8B6F47;">{song.artist}</div>
                 </div>
               </div>
