@@ -22,6 +22,11 @@
   --color-pixel-shadow: #c4b59e;
 }
 
+/* Kyiv Type heading font */
+h1, h2, h3, h4, h5, h6, .font-heading {
+  font-family: "Kyiv Type", "Crimson Pro", serif;
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
@@ -29,7 +34,7 @@
   body {
     background-color: var(--color-bg);
     color: var(--color-text);
-    font-family: 'Nunito', system-ui, sans-serif;
+    font-family: "Crimson Pro", serif;
     overflow-x: hidden;
   }
   ::selection {
@@ -43,7 +48,7 @@
   font-family: 'Press Start 2P', monospace;
 }
 .font-body {
-  font-family: 'Nunito', system-ui, sans-serif;
+  font-family: "Crimson Pro", serif;
 }
 
 /* Pixel art rendering */
