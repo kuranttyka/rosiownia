@@ -4,8 +4,6 @@ const FRAME_SIZE = 32
 const SCALE = 3
 const MOVE_SPEED = 3
 const ATTACK_DURATION = 4 * 100
-const SCROLL_EDGE_THRESHOLD = 50
-const SCROLL_SPEED = 2
 
 const ATLAS_SRC = '/sprites/catplayer/atlas.png'
 
@@ -195,22 +193,7 @@ export default function RPGCat() {
     const scrollY = window.scrollY
     s.onCard = getCardElevation(s.x, s.y - scrollY, catW, catH) > 0
 
-    // Edge scrolling - only when cat is actively moving
-    const isMoving = Math.abs(s.vx) > 0.1 || Math.abs(s.vy) > 0.1
-    if (isMoving) {
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop
-      const scrollHeight = document.documentElement.scrollHeight
-      const clientHeight = window.innerHeight
-
-      // Near top edge and can scroll up
-      if (s.y < SCROLL_EDGE_THRESHOLD && scrollTop > 0) {
-        window.scrollBy(0, -SCROLL_SPEED)
-      }
-
-      // Near bottom edge and can scroll down
-      if (s.y > clientHeight - catH - SCROLL_EDGE_THRESHOLD && scrollTop + clientHeight < scrollHeight) {
-        window.scrollBy(0, SCROLL_SPEED)
-      }
+    
     }
 
     // Frame tick
@@ -321,22 +304,6 @@ export default function RPGCat() {
       joystickCenterRef.current = { x: 80, y: window.innerHeight - 80 }
     }
 
-    // Auto-scroll to follow cat when it goes off-screen
-    const scrollFollow = () => {
-      const s = stateRef.current
-      const catH = FRAME_SIZE * SCALE
-      const scrollY = window.scrollY
-      const viewH = window.innerHeight
-      const catScreenY = s.y - scrollY
-
-      if (catScreenY < 80) {
-        window.scrollBy({ top: catScreenY - 80, behavior: 'auto' })
-      } else if (catScreenY + catH > viewH - 80) {
-        window.scrollBy({ top: (catScreenY + catH) - (viewH - 80), behavior: 'auto' })
-      }
-    }
-    const scrollInterval = setInterval(scrollFollow, 100)
-
     window.addEventListener('keydown', handleKeyDown)
     window.addEventListener('keyup', handleKeyUp)
     window.addEventListener('mousedown', handleMouseDown)
@@ -357,7 +324,6 @@ export default function RPGCat() {
       window.removeEventListener('touchend', handleTouchEnd)
       window.removeEventListener('resize', handleResize)
       cancelAnimationFrame(rafRef.current)
-      clearInterval(scrollInterval)
     }
   }, [gameLoop, handleAttack])
 
