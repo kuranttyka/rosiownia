@@ -35,15 +35,29 @@ import RPGCat from '../components/RPGCat'
         </div>
       </div>
 
-      <!-- Instagram + cat below hero -->
+      <!-- Instagram + Games below hero -->
       <div class="card" style="grid-column: 1; grid-row: 2;">
         <div style="padding: 20px; display: flex; flex-direction: column; gap: 10px;">
           <a href="https://instagram.com/roksolanas_7" target="_blank" rel="noopener" class="ilink">📷 @roksolanas_7</a>
           <a href="https://instagram.com/jumabestia" target="_blank" rel="noopener" class="ilink">🐱 @jumabestia</a>
         </div>
       </div>
-      <div class="card" style="grid-column: 2; grid-row: 2; background: linear-gradient(135deg, #e8d4c4, #d8c4e8); display: flex; align-items: center; justify-content: center;">
-        <span style="font-size: 3rem;">🐱</span>
+      <div class="card" style="grid-column: 2; grid-row: 2;">
+        <div style="padding: 20px;">
+          <h2 class="title">🎮</h2>
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            {[
+              { title: 'Stardew Valley', color: '#7ec850' },
+              { title: 'Hollow Knight', color: '#3a3a5c' },
+              { title: 'Animal Crossing', color: '#7ecfc0' },
+            ].map((game) => (
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <div style={`width: 28px; height: 28px; flex-shrink: 0; border-radius: 5px; background: ${game.color};`}></div>
+                <span style="font-size: 0.78rem; color: #3d2c1e; font-weight: 500;">{game.title}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       <!-- Jewelry wide + Listening + Blog -->

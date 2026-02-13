@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+/* Self-hosted Kyiv Type font */
+@font-face {
+  font-family: "Kyiv Type";
+  src: url("/fonts/KyivRegular.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme {
   --color-bg: #faf3e8;
   --color-bg-warm: #f5ebe0;

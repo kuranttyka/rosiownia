@@ -4,6 +4,8 @@ const FRAME_SIZE = 32
 const SCALE = 3
 const MOVE_SPEED = 3
 const ATTACK_DURATION = 4 * 100
+const SCROLL_EDGE_THRESHOLD = 50
+const SCROLL_SPEED = 2
 
 const ATLAS_SRC = '/sprites/catplayer/atlas.png'
 
@@ -175,6 +177,24 @@ export default function RPGCat() {
     if (s.x + catW > window.innerWidth) s.x = window.innerWidth - catW
     if (s.y < 0) s.y = 0
     if (s.y + catH > window.innerHeight) s.y = window.innerHeight - catH
+
+    // Edge scrolling - only when cat is actively moving
+    const isMoving = Math.abs(s.vx) > 0.1 || Math.abs(s.vy) > 0.1
+    if (isMoving) {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+      const scrollHeight = document.documentElement.scrollHeight
+      const clientHeight = window.innerHeight
+
+      // Near top edge and can scroll up
+      if (s.y < SCROLL_EDGE_THRESHOLD && scrollTop > 0) {
+        window.scrollBy(0, -SCROLL_SPEED)
+      }
+
+      // Near bottom edge and can scroll down
+      if (s.y > clientHeight - catH - SCROLL_EDGE_THRESHOLD && scrollTop + clientHeight < scrollHeight) {
+        window.scrollBy(0, SCROLL_SPEED)
+      }
+    }
 
     // Frame tick
     s.frameTimer += dt
@@ -377,7 +397,7 @@ export default function RPGCat() {
           left: '50%',
           transform: 'translateX(-50%)',
           zIndex: 10000,
-          fontFamily: '"Crimson Pro", serif',
+          fontFamily: '"Kyiv Type", "Crimson Pro", serif',
           fontSize: 13,
           color: '#8B6F47',
           opacity: 0.5,

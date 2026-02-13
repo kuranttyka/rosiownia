@@ -87,19 +87,33 @@ import RPGCat from '../components/RPGCat'
         </div>
       </div>
 
-      <!-- Row 3 bottom: Blog + cat -->
+      <!-- Row 3 bottom: Games + Blog + cat -->
       <div class="card" style="grid-column: 3; grid-row: 5;">
         <div style="padding: 24px;">
-          <h2 class="title">📝 Blog</h2>
+          <h2 class="title">🎮 Recently Played</h2>
           <div style="display: flex; flex-direction: column; gap: 8px;">
-            {['Recycled silver jewelry', 'Top anime 2025'].map((t) => (
-              <div style="font-size: 0.88rem; color: #3d2c1e; padding: 8px 0; border-bottom: 1px solid rgba(61,44,30,0.06);">{t} →</div>
+            {[
+              { title: 'Stardew Valley', color: '#7ec850' },
+              { title: 'Hollow Knight', color: '#3a3a5c' },
+              { title: 'Animal Crossing', color: '#7ecfc0' },
+            ].map((game) => (
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <div style={`width: 32px; height: 32px; flex-shrink: 0; border-radius: 6px; background: ${game.color};`}></div>
+                <div style="font-size: 0.82rem; color: #3d2c1e; font-weight: 500;">{game.title}</div>
+              </div>
             ))}
           </div>
         </div>
       </div>
-      <div class="card" style="grid-column: 4; grid-row: 5; background: linear-gradient(135deg, #e8d4c4 0%, #d8c4e8 100%); display: flex; align-items: center; justify-content: center;">
-        <span style="font-size: 3rem;">🐱</span>
+      <div class="card" style="grid-column: 4; grid-row: 5;">
+        <div style="padding: 24px;">
+          <h2 class="title">📝</h2>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            {['Recycled silver', 'Top anime 2025'].map((t) => (
+              <div style="font-size: 0.88rem; color: #3d2c1e; padding: 8px 0; border-bottom: 1px solid rgba(61,44,30,0.06);">{t} →</div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   </main>

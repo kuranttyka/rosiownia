@@ -15,7 +15,7 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
     server: {
-      allowedHosts: ['.trycloudflare.com', '.vercel.app']
+      allowedHosts: ['.trycloudflare.com', '.vercel.app', 'mini.uaru-chimera.ts.net']
     }
   }
 });
