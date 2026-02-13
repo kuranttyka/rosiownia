@@ -34,7 +34,7 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   body {
     background-color: var(--color-bg);
     color: var(--color-text);
-    font-family: "Crimson Pro", serif;
+    font-family: "Geist", system-ui, sans-serif;
     overflow-x: hidden;
   }
   ::selection {
@@ -48,7 +48,7 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   font-family: 'Press Start 2P', monospace;
 }
 .font-body {
-  font-family: "Crimson Pro", serif;
+  font-family: "Geist", system-ui, sans-serif;
 }
 
 /* Pixel art rendering */
