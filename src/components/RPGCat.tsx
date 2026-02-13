@@ -193,9 +193,6 @@ export default function RPGCat() {
     const scrollY = window.scrollY
     s.onCard = getCardElevation(s.x, s.y - scrollY, catW, catH) > 0
 
-    
-    }
-
     // Frame tick
     s.frameTimer += dt
     const anim = anims[s.anim]
