@@ -35,22 +35,39 @@ if (typeof window !== 'undefined') {
 let audioCtx: AudioContext | null = null
 let clickAudioBuffer: AudioBuffer | null = null
 
-const loadAudio = async (url: string) => {
-  if (!audioCtx) audioCtx = new AudioContext()
-  const response = await fetch(url)
-  const arrayBuffer = await response.arrayBuffer()
-  return await audioCtx.decodeAudioData(arrayBuffer)
-}
-
 async function playClickSound() {
   if (!audioCtx) audioCtx = new AudioContext()
   if (!clickAudioBuffer) {
-    clickAudioBuffer = await loadAudio('/sounds/click-tape.mp3')
+    const response = await fetch('/sounds/click-tape.mp3')
+    const arrayBuffer = await response.arrayBuffer()
+    clickAudioBuffer = await audioCtx.decodeAudioData(arrayBuffer)
   }
   const source = audioCtx.createBufferSource()
   source.buffer = clickAudioBuffer
   source.connect(audioCtx.destination)
   source.start(0)
+}
+
+/**
+ * Check if the cat is overlapping any .card element.
+ * Returns the card's elevation (z offset) or 0 if on the background.
+ */
+function getCardElevation(cx: number, cy: number, catW: number, catH: number): number {
+  const cards = document.querySelectorAll('.card')
+  const catCx = cx + catW / 2
+  const catCy = cy + catH / 2
+  for (const card of cards) {
+    const rect = card.getBoundingClientRect()
+    if (
+      catCx >= rect.left &&
+      catCx <= rect.right &&
+      catCy >= rect.top &&
+      catCy <= rect.bottom
+    ) {
+      return 1 // on a card
+    }
+  }
+  return 0
 }
 
 export default function RPGCat() {
@@ -67,13 +84,17 @@ export default function RPGCat() {
     idleTimer: 0,
     attackTimer: 0,
     initialized: false,
+    onCard: false,
+    shadowScale: 1,
   })
   const rafRef = useRef(0)
   const lastTimeRef = useRef(0)
   const joystickRef = useRef({ active: false, dx: 0, dy: 0, touchId: -1 })
   const joystickCenterRef = useRef({ x: 80, y: 0 })
 
-  const [catStyle, setCatStyle] = useState({ x: 0, y: 0, anim: 'idle', frame: 0, facingRight: true })
+  const [catStyle, setCatStyle] = useState({
+    x: 0, y: 0, anim: 'idle', frame: 0, facingRight: true, onCard: false,
+  })
   const [joystick, setJoystick] = useState({ dx: 0, dy: 0 })
   const [isMobile, setIsMobile] = useState(false)
 
@@ -86,8 +107,6 @@ export default function RPGCat() {
     s.frame = 0
     s.frameTimer = 0
     s.idleTimer = 0
-    // Capture current velocity for sliding momentum
-    // (velocity will be applied during attack with friction)
     playClickSound()
   }, [])
 
@@ -111,28 +130,25 @@ export default function RPGCat() {
       s.attackTimer -= dt
       if (s.attackTimer <= 0) {
         s.attackTimer = 0
-        // When attack ends, clear velocity
         s.vx = 0
         s.vy = 0
       }
     }
 
-    // Movement logic
+    // Movement
     if (s.attackTimer <= 0) {
-      // Normal movement - not attacking
       const joy = joystickRef.current
-      const left = keys.has('a') || keys.has('arrowleft') || (joy.active && joy.dx < -20)
+      const left  = keys.has('a') || keys.has('arrowleft')  || (joy.active && joy.dx < -20)
       const right = keys.has('d') || keys.has('arrowright') || (joy.active && joy.dx > 20)
-      const up = keys.has('w') || keys.has('arrowup') || (joy.active && joy.dy < -20)
-      const down = keys.has('s') || keys.has('arrowdown') || (joy.active && joy.dy > 20)
+      const up    = keys.has('w') || keys.has('arrowup')    || (joy.active && joy.dy < -20)
+      const down  = keys.has('s') || keys.has('arrowdown')  || (joy.active && joy.dy > 20)
 
       let dx = 0, dy = 0
-      if (left) { dx -= MOVE_SPEED; s.facingRight = false }
+      if (left)  { dx -= MOVE_SPEED; s.facingRight = false }
       if (right) { dx += MOVE_SPEED; s.facingRight = true }
       if (up) dy -= MOVE_SPEED
       if (down) dy += MOVE_SPEED
 
-      // Normalize diagonal
       if (dx !== 0 && dy !== 0) {
         const norm = Math.sqrt(dx * dx + dy * dy)
         dx = (dx / norm) * MOVE_SPEED
@@ -141,18 +157,16 @@ export default function RPGCat() {
 
       s.vx = dx
       s.vy = dy
-
       s.x += s.vx
       s.y += s.vy
 
-      // Animation
+      // Animation state
       const moving = s.vx !== 0 || s.vy !== 0
       let newAnim = s.anim
       if (moving) {
         newAnim = 'walk'
         s.idleTimer = 0
       } else if (s.anim === 'sleep') {
-        // Stay asleep — only wake on user input (movement/click)
         newAnim = 'sleep'
       } else {
         s.idleTimer += dt
@@ -164,19 +178,22 @@ export default function RPGCat() {
         s.frameTimer = 0
       }
     } else {
-      // During attack - apply momentum with friction
       s.vx *= 0.5
       s.vy *= 0.5
-
       s.x += s.vx
       s.y += s.vy
     }
 
-    // Bounds
+    // Page-scroll bounds (cat can scroll with page)
+    const pageH = document.documentElement.scrollHeight
     if (s.x < 0) s.x = 0
     if (s.x + catW > window.innerWidth) s.x = window.innerWidth - catW
     if (s.y < 0) s.y = 0
-    if (s.y + catH > window.innerHeight) s.y = window.innerHeight - catH
+    if (s.y + catH > pageH) s.y = pageH - catH
+
+    // Card detection
+    const scrollY = window.scrollY
+    s.onCard = getCardElevation(s.x, s.y - scrollY, catW, catH) > 0
 
     // Edge scrolling - only when cat is actively moving
     const isMoving = Math.abs(s.vx) > 0.1 || Math.abs(s.vy) > 0.1
@@ -210,6 +227,7 @@ export default function RPGCat() {
       anim: s.anim,
       frame: s.frame,
       facingRight: s.facingRight,
+      onCard: s.onCard,
     })
 
     rafRef.current = requestAnimationFrame(gameLoop)
@@ -220,6 +238,14 @@ export default function RPGCat() {
       const key = e.key.toLowerCase()
       if (['a','d','w','s','arrowleft','arrowright','arrowup','arrowdown'].includes(key)) {
         keysRef.current.add(key)
+        // Wake from sleep on any movement key
+        const s = stateRef.current
+        if (s.anim === 'sleep') {
+          s.anim = 'idle'
+          s.idleTimer = 0
+          s.frame = 0
+          s.frameTimer = 0
+        }
       }
     }
     const handleKeyUp = (e: KeyboardEvent) => {
@@ -230,35 +256,29 @@ export default function RPGCat() {
       handleAttack(e.clientX)
     }
 
-    // Joystick area: bottom-left 160x160
+    // Joystick touch handling
     const JOYSTICK_ZONE = 160
     const JOY_RADIUS = 60
 
     const handleTouchStart = (e: TouchEvent) => {
       for (const touch of Array.from(e.changedTouches)) {
         const { clientX: tx, clientY: ty } = touch
-        const center = joystickCenterRef.current
-        const distToCenter = Math.sqrt((tx - center.x) ** 2 + (ty - center.y) ** 2)
-
         if (tx < JOYSTICK_ZONE && ty > window.innerHeight - JOYSTICK_ZONE && !joystickRef.current.active) {
-          // Activate joystick — prevent scroll
           e.preventDefault()
           const joy = joystickRef.current
+          const center = joystickCenterRef.current
           joy.active = true
           joy.touchId = touch.identifier
           joy.dx = Math.max(-JOY_RADIUS, Math.min(JOY_RADIUS, tx - center.x))
           joy.dy = Math.max(-JOY_RADIUS, Math.min(JOY_RADIUS, ty - center.y))
           setJoystick({ dx: joy.dx, dy: joy.dy })
-        } else if (distToCenter <= 120 && !joystickRef.current.active) {
-          // Enlarged hitbox around joystick center
-          const joy = joystickRef.current
-          joy.active = true
-          joy.touchId = touch.identifier
-          joy.dx = Math.max(-JOY_RADIUS, Math.min(JOY_RADIUS, tx - center.x))
-          joy.dy = Math.max(-JOY_RADIUS, Math.min(JOY_RADIUS, ty - center.y))
-          setJoystick({ dx: joy.dx, dy: joy.dy })
+          // Wake from sleep
+          const s = stateRef.current
+          if (s.anim === 'sleep') {
+            s.anim = 'idle'
+            s.idleTimer = 0
+          }
         } else {
-          // Attack if not on interactive element
           const el = document.elementFromPoint(tx, ty)
           if (!el || !el.closest('a, button, input, textarea, select, [role="button"]')) {
             handleAttack(tx)
@@ -301,6 +321,22 @@ export default function RPGCat() {
       joystickCenterRef.current = { x: 80, y: window.innerHeight - 80 }
     }
 
+    // Auto-scroll to follow cat when it goes off-screen
+    const scrollFollow = () => {
+      const s = stateRef.current
+      const catH = FRAME_SIZE * SCALE
+      const scrollY = window.scrollY
+      const viewH = window.innerHeight
+      const catScreenY = s.y - scrollY
+
+      if (catScreenY < 80) {
+        window.scrollBy({ top: catScreenY - 80, behavior: 'auto' })
+      } else if (catScreenY + catH > viewH - 80) {
+        window.scrollBy({ top: (catScreenY + catH) - (viewH - 80), behavior: 'auto' })
+      }
+    }
+    const scrollInterval = setInterval(scrollFollow, 100)
+
     window.addEventListener('keydown', handleKeyDown)
     window.addEventListener('keyup', handleKeyUp)
     window.addEventListener('mousedown', handleMouseDown)
@@ -321,6 +357,7 @@ export default function RPGCat() {
       window.removeEventListener('touchend', handleTouchEnd)
       window.removeEventListener('resize', handleResize)
       cancelAnimationFrame(rafRef.current)
+      clearInterval(scrollInterval)
     }
   }, [gameLoop, handleAttack])
 
@@ -331,10 +368,28 @@ export default function RPGCat() {
 
   return (
     <>
-      {/* Cat sprite — fixed overlay */}
+      {/* Cat shadow */}
       <div
         style={{
-          position: 'fixed',
+          position: 'absolute',
+          left: catStyle.x + scaledW * 0.15,
+          top: catStyle.y + scaledH - 6,
+          width: scaledW * 0.7,
+          height: 8,
+          borderRadius: '50%',
+          background: 'rgba(61, 44, 30, 0.12)',
+          filter: 'blur(2px)',
+          zIndex: 9998,
+          pointerEvents: 'none',
+          transition: 'opacity 0.2s',
+          opacity: catStyle.anim === 'sleep' ? 0.06 : 0.12,
+        }}
+      />
+
+      {/* Cat sprite */}
+      <div
+        style={{
+          position: 'absolute',
           left: catStyle.x,
           top: catStyle.y,
           width: scaledW,
@@ -347,6 +402,9 @@ export default function RPGCat() {
           backgroundPositionY: -(spriteY * SCALE),
           imageRendering: 'pixelated',
           pointerEvents: 'none',
+          // Subtle lift when on a card
+          filter: catStyle.onCard ? 'drop-shadow(0 4px 6px rgba(61,44,30,0.15))' : 'none',
+          transition: 'filter 0.2s ease',
         }}
       />
 
@@ -363,7 +421,6 @@ export default function RPGCat() {
             pointerEvents: 'none',
           }}
         >
-          {/* Base */}
           <div
             style={{
               width: 100,
@@ -373,7 +430,6 @@ export default function RPGCat() {
               border: '2px solid rgba(61,44,30,0.15)',
             }}
           />
-          {/* Thumb */}
           <div
             style={{
               position: 'absolute',
