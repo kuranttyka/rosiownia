@@ -36,7 +36,7 @@ export default function CatSprite() {
   const { x, y, targetX, targetY, animKey } = state.context
   const [pos, setPos] = useState({ x, y })
   const [frame, setFrame] = useState(0)
-  const moveRef = useRef<ReturnType<typeof setInterval>>()
+  const moveRef = useRef<ReturnType<typeof setInterval>>(undefined)
 
   // Walking movement
   const isWalking = state.matches('walking')

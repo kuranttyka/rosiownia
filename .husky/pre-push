@@ -1,0 +1,3 @@
+#!/bin/sh
+echo "🐈‍⬛ running typecheck + build..."
+npm run typecheck && npm run build

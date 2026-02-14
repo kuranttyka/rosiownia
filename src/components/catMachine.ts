@@ -189,10 +189,10 @@ export const catMachine = setup({
   on: {
     CLICK: { target: '.surprised', actions: 'startSurprised' },
   },
-}, {
+}).provide({
   delays: {
-    IDLE_DELAY: ({ context }) => context.stateTimer,
-    SLEEP_DELAY: ({ context }) => context.stateTimer,
-    ACTION_DELAY: ({ context }) => context.stateTimer,
+    IDLE_DELAY: ({ context }: { context: CatContext }) => context.stateTimer,
+    SLEEP_DELAY: ({ context }: { context: CatContext }) => context.stateTimer,
+    ACTION_DELAY: ({ context }: { context: CatContext }) => context.stateTimer,
   },
 })
