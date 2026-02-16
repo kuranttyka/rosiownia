@@ -24,7 +24,7 @@
 
 /* Kyiv Type heading font */
 h1, h2, h3, h4, h5, h6, .font-heading {
-  font-family: "Kyiv Type", "Crimson Pro", serif;
+  font-family: "Kyiv Type", serif;
 }
 
 @layer base {

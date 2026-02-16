@@ -416,7 +416,7 @@ export default function RPGCat() {
           left: '50%',
           transform: 'translateX(-50%)',
           zIndex: 10000,
-          fontFamily: '"Kyiv Type", "Crimson Pro", serif',
+          fontFamily: '"Kyiv Type", serif',
           fontSize: 13,
           color: '#8B6F47',
           opacity: 0.5,

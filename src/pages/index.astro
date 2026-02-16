@@ -18,7 +18,7 @@ import RPGCat from '../components/RPGCat'
       <!-- ═══ Hero — spans 2 cols ═══ -->
       <div class="card hero-card col-span-2">
         <div class="hero-inner">
-          <h1 class="hero-title">Rouzeris</h1>
+          <h1 class="font-heading text-[clamp(2.8rem,6vw,4.5rem)] font-light text-[#3d2c1e] m-0 leading-[1.1] tracking-tight">Rouzeris</h1>
           <p class="hero-sub">artist · jewelry maker · developer</p>
           <div class="hero-doodle">✦ ✧ ✦</div>
         </div>
@@ -27,7 +27,7 @@ import RPGCat from '../components/RPGCat'
       <!-- ═══ About Me — tall, right column ═══ -->
       <div class="card about-card row-span-2">
         <div class="card-pad">
-          <h2 class="card-title title-script">About Me</h2>
+          <h2 class="font-heading text-[1.4rem] font-bold italic text-[#3d2c1e] mb-4 tracking-[0.02em]">About Me</h2>
           <div class="about-avatar">🌸</div>
           <p class="about-text">
             Hi, I'm Rosia! I make jewelry from recycled silver, watch too much anime, and build things on the internet.
@@ -46,7 +46,7 @@ import RPGCat from '../components/RPGCat'
       <!-- ═══ Anime Library — spans 2 cols ═══ -->
       <div class="card anime-card col-span-2">
         <div class="card-pad">
-          <h2 class="card-title title-fun">📺 Anime Library</h2>
+          <h2 class="text-[1.05rem] font-semibold text-[#3d2c1e] mb-4 tracking-[0.04em]">📺 Anime Library</h2>
           <div class="anime-scroll">
             {[
               { title: 'Spy x Family', color: '#e8c4c4' },
@@ -70,7 +70,7 @@ import RPGCat from '../components/RPGCat'
       <!-- ═══ Yuma — small cozy ═══ -->
       <div class="card yuma-card">
         <div class="card-pad text-center">
-          <h2 class="card-title title-script">Meet Yuma 🐱</h2>
+          <h2 class="font-heading text-[1.4rem] font-bold italic text-[#3d2c1e] mb-4 tracking-[0.02em]">Meet Yuma 🐱</h2>
           <div class="yuma-photo"><span style="font-size:3rem;">🐈‍⬛</span></div>
           <p class="yuma-desc">
             Chief nap officer. Professional keyboard-sitter. Will steal your chair the moment you stand up.
@@ -84,7 +84,7 @@ import RPGCat from '../components/RPGCat'
       <!-- ═══ Jewelry — spans 2 cols ═══ -->
       <div class="card jewelry-card col-span-2">
         <div class="card-pad">
-          <h2 class="card-title title-elegant">✨ Jewelry</h2>
+          <h2 class="font-heading text-[1.25rem] font-normal text-[#3d2c1e] mb-4 tracking-[0.06em] uppercase">✨ Jewelry</h2>
           <div class="jewelry-grid">
             {[
               { name: 'silver ring', color: '#c8c0b8' },
@@ -106,7 +106,7 @@ import RPGCat from '../components/RPGCat'
       <!-- ═══ Listening ═══ -->
       <div class="card spotify-card">
         <div class="card-pad">
-          <h2 class="card-title title-fun">🎵 Listening</h2>
+          <h2 class="text-[1.05rem] font-semibold text-[#3d2c1e] mb-4 tracking-[0.04em]">🎵 Listening</h2>
           <div class="song-list">
             {[
               { track: 'Stefania', artist: 'Kalush Orchestra', color: '#e8c4a4' },
@@ -130,7 +130,7 @@ import RPGCat from '../components/RPGCat'
       <!-- ═══ Blog — spans 2 cols ═══ -->
       <div class="card blog-card col-span-2">
         <div class="card-pad">
-          <h2 class="card-title title-elegant">📝 Blog</h2>
+          <h2 class="font-heading text-[1.25rem] font-normal text-[#3d2c1e] mb-4 tracking-[0.06em] uppercase">📝 Blog</h2>
           <div class="blog-grid">
             {[
               { title: 'Making jewelry with recycled silver', color: '#c8c0b8' },
@@ -150,7 +150,7 @@ import RPGCat from '../components/RPGCat'
       <!-- ═══ Instagram ═══ -->
       <div class="card insta-card">
         <div class="card-pad">
-          <h2 class="card-title title-fun">📸 Instagram</h2>
+          <h2 class="text-[1.05rem] font-semibold text-[#3d2c1e] mb-4 tracking-[0.04em]">📸 Instagram</h2>
           <div class="insta-links">
             <a href="https://instagram.com/roksolanas_7" target="_blank" rel="noopener" class="insta-link">
               📷 @roksolanas_7
@@ -279,49 +279,12 @@ import RPGCat from '../components/RPGCat'
     background: linear-gradient(135deg, #fefcf8 0%, #fff0f4 50%, #fef0e8 100%);
   }
 
-  /* ═══════════════════════════════════════
-     TITLE STYLES
-     ═══════════════════════════════════════ */
-  .card-title {
-    font-size: 1.1rem;
-    font-weight: 500;
-    color: #3d2c1e;
-    margin: 0 0 16px;
-    letter-spacing: 0.02em;
-  }
-  .title-script {
-    font-family: 'Crimson Pro', serif;
-    font-size: 1.4rem;
-    font-weight: 700;
-    font-style: italic;
-  }
-  .title-fun {
-    font-size: 1.05rem;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-  }
-  .title-elegant {
-    font-family: 'Crimson Pro', serif;
-    font-size: 1.25rem;
-    font-weight: 400;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
 
   /* ═══════════════════════════════════════
      HERO
      ═══════════════════════════════════════ */
   .hero-inner {
     padding: 52px 44px;
-  }
-  .hero-title {
-    font-family: 'Crimson Pro', serif;
-    font-size: clamp(2.8rem, 6vw, 4.5rem);
-    font-weight: 300;
-    color: #3d2c1e;
-    margin: 0;
-    line-height: 1.1;
-    letter-spacing: -0.02em;
   }
   .hero-sub {
     font-size: 1.15rem;
